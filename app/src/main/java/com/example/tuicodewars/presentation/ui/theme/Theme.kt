@@ -1,4 +1,4 @@
-package com.example.tuicodewars.ui.theme
+package com.example.tuicodewars.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

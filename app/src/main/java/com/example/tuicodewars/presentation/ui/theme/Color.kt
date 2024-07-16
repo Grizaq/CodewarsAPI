@@ -1,4 +1,4 @@
-package com.example.tuicodewars.ui.theme
+package com.example.tuicodewars.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
