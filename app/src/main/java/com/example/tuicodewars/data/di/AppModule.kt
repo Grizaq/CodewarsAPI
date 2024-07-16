@@ -31,7 +31,7 @@ object AppModule {
     fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor) =
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(2, TimeUnit.SECONDS) // Short timeout for emulator bug where API response is in loading for too long
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()

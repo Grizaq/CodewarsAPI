@@ -89,6 +89,12 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    //MockK
+    testImplementation ("io.mockk:mockk:1.13.2")
+    androidTestImplementation ("io.mockk:mockk-android:1.13.2")
+
 // required for lerp
     implementation ("androidx.compose.ui:ui-util")
 

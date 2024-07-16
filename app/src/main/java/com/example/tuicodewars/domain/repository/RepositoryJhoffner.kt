@@ -1,6 +1,5 @@
 package com.example.tuicodewars.domain.repository
 
-import android.util.Log
 import com.example.tuicodewars.data.model.DataJhoffner
 import com.example.tuicodewars.data.remote.API
 import com.example.tuicodewars.data.repository.Repository
@@ -16,16 +15,24 @@ class RepositoryJhoffner @Inject constructor(private val api: API) : Repository 
         emit(Resource.Loading())
         try {
             val response = api.getItemList()
-            if (response.isSuccessful)
+
+            if (response.isSuccessful) {
                 response.body()?.let {
+//                    Log.i("DebugNetworkRepo", "Success: $it")
                     emit(Resource.Success(it))
-                    Log.i("DebugNetworkARepoLet", response.toString())
+                } ?: run {
+//                    Log.e("DebugNetworkRepo", "Response body is null")
+                    emit(Resource.Error("Empty response body"))
                 }
-            else
+            } else {
+//                Log.e("DebugNetworkRepo", "Error: ${response.code()}")
                 emit(Resource.Error(response.code().toString()))
+            }
         } catch (e: HttpException) {
+//            Log.e("DebugNetworkRepo", "HttpException: ${e.message}")
             emit(Resource.Error("Could not load data"))
         } catch (e: IOException) {
+//            Log.e("DebugNetworkRepo", "IOException: ${e.message}")
             emit(Resource.Error("Check internet"))
         }
     }
