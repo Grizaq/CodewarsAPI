@@ -20,20 +20,23 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-//@RootNavGraph(start = true)
 @Destination
 @Composable
 fun ListDetails(
     modifier: Modifier = Modifier,
     viewModel: ViewModelChallengeData = viewModel(LocalContext.current as ComponentActivity),
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    challengeId: String
 ) {
+    LaunchedEffect(challengeId) {
+    viewModel.setChallengeId(challengeId)
+    }
     val uiState by viewModel.challengeData.collectAsState()
     val challengeData = uiState.data
     Log.i("DebugnetworkCodeWars details list screen", challengeData.toString())
     when (uiState) {
         is Resource.Success -> {
-            Text(text = "Hello ${challengeData?.totalCompleted}")
+            Text(text = "${challengeData?.name}")
         }
 
         is Resource.Loading -> {
@@ -47,7 +50,8 @@ fun ListDetails(
             val messageReload = stringResource(R.string.standard_reload_error_message)
             LaunchedEffect(key1 = "") {
                 delay(5 * 1000)
-                viewModel.getChallengeData("asd")
+                viewModel.setChallengeId(challengeId)
+                viewModel.getChallengeData(challengeId)
                 Log.i("MainScreen", messageReload)
             }
         }

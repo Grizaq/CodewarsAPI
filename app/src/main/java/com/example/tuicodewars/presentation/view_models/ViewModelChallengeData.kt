@@ -21,8 +21,8 @@ class ViewModelChallengeData @Inject constructor(
         MutableStateFlow(Resource.Loading())
     val challengeData: StateFlow<Resource<Challenge>> = _challengeData
 
-    init {
-        getChallengeData("asd")
+    fun setChallengeId(id: String) {
+        getChallengeData(id)
     }
 
     fun getChallengeData(id: String) = viewModelScope.launch {

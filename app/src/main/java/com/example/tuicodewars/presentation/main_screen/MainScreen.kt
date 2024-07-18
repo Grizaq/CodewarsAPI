@@ -29,12 +29,14 @@ import com.example.tuicodewars.R
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
+import com.example.tuicodewars.presentation.destinations.ListScreenDestination
 import com.example.tuicodewars.presentation.view_models.ViewModelJhoffner
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-//@RootNavGraph(start = true)
+@RootNavGraph(start = true)
 @Destination
 @Composable
 fun MainScreen(
@@ -111,7 +113,7 @@ fun MainScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(onClick = { navigator.navigate(ListScreenDestination) }) {
                         Text(text = "Continue")
                     }
                 }

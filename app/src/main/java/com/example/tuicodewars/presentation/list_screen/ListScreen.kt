@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -28,14 +29,14 @@ import com.example.tuicodewars.R
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
-import com.example.tuicodewars.presentation.ui.theme.Dimensions
+import com.example.tuicodewars.presentation.destinations.ListDetailsDestination
 import com.example.tuicodewars.presentation.view_models.ViewModelAuthored
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
-@RootNavGraph(start = true)
+//@RootNavGraph(start = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun ListScreen(
@@ -48,7 +49,6 @@ fun ListScreen(
     Log.i("DebugnetworkCodeWars list screen", challengesList.toString())
     when (uiState) {
         is Resource.Success -> {
-//            Text(text = "Hello ${challengesList[0].description}")
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
             ) {
@@ -58,8 +58,8 @@ fun ListScreen(
                             .fillMaxWidth()
                             .padding(16.dp),
                         elevation = CardDefaults.cardElevation(8.dp),
-//                        onClick = {
-//                        }
+                        onClick = { navigator.navigate(ListDetailsDestination(challengeId = item.id))
+                        }
                     ) {
                         Spacer(modifier = Modifier.height(16.dp))
                         Box {
