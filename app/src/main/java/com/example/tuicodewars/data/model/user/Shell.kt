@@ -1,4 +1,4 @@
-package com.example.tuicodewars.data.model
+package com.example.tuicodewars.data.model.user
 
 data class Shell(
     val color: String,

@@ -3,7 +3,7 @@ package com.example.tuicodewars.presentation.view_models
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tuicodewars.data.model.user.DataJhoffner
+import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,21 +14,22 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ViewModelJhoffner @Inject constructor(
+class ViewModelChallengeData @Inject constructor(
     private val repo: Repository
 ) : ViewModel() {
-    private val _itemList: MutableStateFlow<Resource<DataJhoffner>> =
+    private val _challengeData: MutableStateFlow<Resource<Challenge>> =
         MutableStateFlow(Resource.Loading())
-    val itemList: StateFlow<Resource<DataJhoffner>> = _itemList
+    val challengeData: StateFlow<Resource<Challenge>> = _challengeData
 
     init {
-        getItemList()
+        getChallengeData("asd")
     }
 
-    fun getItemList() = viewModelScope.launch {
-        repo.getItemsList().collectLatest {
-            Log.i("DebugnetworkCodeWars view model main", itemList.value.data.toString())
-            _itemList.emit(it)
+    fun getChallengeData(id: String) = viewModelScope.launch {
+        repo.getChallengeData(id).collectLatest {
+            Log.i("DebugnetworkCodeWars view model challenge", challengeData.value.data.toString())
+            _challengeData.emit(it)
         }
     }
+
 }

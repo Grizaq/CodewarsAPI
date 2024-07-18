@@ -1,4 +1,4 @@
-package com.example.tuicodewars.data.model
+package com.example.tuicodewars.data.model.user
 
 data class Languages(
     val coffeescript: Coffeescript,

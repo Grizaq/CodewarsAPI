@@ -1,6 +1,6 @@
-package com.example.tuicodewars.data.model
+package com.example.tuicodewars.data.model.user
 
-data class Overall(
+data class Typescript(
     val color: String,
     val name: String,
     val rank: Int,

@@ -1,4 +1,4 @@
-package com.example.tuicodewars.presentation.main_screen
+package com.example.tuicodewars.presentation.commons
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

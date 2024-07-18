@@ -1,4 +1,4 @@
-package com.example.tuicodewars.presentation.main_screen
+package com.example.tuicodewars.presentation.commons
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.tuicodewars.R
 import com.example.tuicodewars.presentation.ui.theme.Dimensions
-import com.example.tuicodewars.presentation.view_models.ViewModelJhoffner
 
 @Composable
-fun ShowErrorMessage(message: String, viewModel: ViewModelJhoffner) {
+fun ShowErrorMessage(message: String, reload: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column {
             Text(
@@ -28,7 +27,7 @@ fun ShowErrorMessage(message: String, viewModel: ViewModelJhoffner) {
             )
             Box(modifier = Modifier.fillMaxWidth()) {
                 Button(
-                    onClick = { viewModel.getItemList() },
+                    onClick = { reload() },
                     modifier = Modifier
                         .align(Alignment.Center)
                         .fillMaxWidth(Dimensions.centerButtonWidth),
