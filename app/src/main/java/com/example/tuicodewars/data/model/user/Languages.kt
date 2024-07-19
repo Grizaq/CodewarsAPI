@@ -1,5 +1,7 @@
 package com.example.tuicodewars.data.model.user
 
+import kotlin.reflect.full.memberProperties
+
 data class Languages(
     val coffeescript: Coffeescript,
     val crystal: Crystal,
@@ -14,4 +16,10 @@ data class Languages(
     val shell: Shell,
     val sql: Sql,
     val typescript: Typescript
-)
+){
+    companion object {
+        fun getLanguageNames(languages: Languages): List<String> {
+            return languages::class.memberProperties.map { it.name }
+        }
+    }
+}

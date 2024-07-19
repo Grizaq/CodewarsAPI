@@ -4,5 +4,19 @@
     <string name="reload_text">Reload</string>
     <string name="standard_reload_error_message">reloading after error</string>
     <string name="logo">Code Wars logo</string>
+    <string name="list_of_languages_practiced">List of languages practiced:</string>
+    <string name="completed_challenges">Completed %1$s challenges</string>
+    <string name="contributed_challenges">Contributed %1$s challenges</string>
+    <string name="btn_to_browser">Open in Browser</string>
+    <string name="name_creator">Name: %1$s</string>
+    <string name="list_rank">Rank: %1$s</string>
+    <string name="text_languages">Languages: %1$s</string>
+    <string name="back_button_desc">Back button</string>
+    <string name="message_about">message about %1$s</string>
+    <string name="btn_continue">Continue</string>
+    <string name="arrow_up_description">arrow up</string>
+    <string name="scaffold_text_greeting_screen">Greeting Screen</string>
+    <string name="scaffold_text_authored_list">Authored List</string>
+    <string name="scaffold_text_challenge_details">Challenge details</string>
 
 </resources>

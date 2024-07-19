@@ -1,6 +1,5 @@
 package com.example.tuicodewars.presentation.view_models
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tuicodewars.data.model.user.DataJhoffner
@@ -27,7 +26,6 @@ class ViewModelJhoffner @Inject constructor(
 
     fun getItemList() = viewModelScope.launch {
         repo.getItemsList().collectLatest {
-            Log.i("DebugnetworkCodeWars view model main", itemList.value.data.toString())
             _itemList.emit(it)
         }
     }

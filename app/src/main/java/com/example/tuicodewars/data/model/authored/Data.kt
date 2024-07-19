@@ -8,4 +8,10 @@ data class Data(
     val rank: Int,
     val rankName: String,
     val tags: List<String>
-)
+) {
+    companion object {
+        fun List<String>.toCommaSeparatedString(): String {
+            return this.joinToString(separator = ", ")
+        }
+    }
+}

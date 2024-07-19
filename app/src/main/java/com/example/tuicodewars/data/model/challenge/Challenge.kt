@@ -21,4 +21,17 @@ data class Challenge(
     val unresolved: Unresolved,
     val url: String,
     val voteScore: Int
-)
+) {
+    companion object {
+        //required for some description containing too long description due to long URL inside
+        fun String.shortenLongWords(): String {
+            return this.split(" ").joinToString(" ") { word ->
+                if (word.length > 20) {
+                    "${word.take(5)}[...]${word.takeLast(5)}"
+                } else {
+                    word
+                }
+            }
+        }
+    }
+}

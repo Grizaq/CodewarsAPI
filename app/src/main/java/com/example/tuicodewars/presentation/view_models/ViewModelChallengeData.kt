@@ -1,6 +1,5 @@
 package com.example.tuicodewars.presentation.view_models
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tuicodewars.data.model.challenge.Challenge
@@ -27,7 +26,6 @@ class ViewModelChallengeData @Inject constructor(
 
     fun getChallengeData(id: String) = viewModelScope.launch {
         repo.getChallengeData(id).collectLatest {
-            Log.i("DebugnetworkCodeWars view model challenge", challengeData.value.data.toString())
             _challengeData.emit(it)
         }
     }
