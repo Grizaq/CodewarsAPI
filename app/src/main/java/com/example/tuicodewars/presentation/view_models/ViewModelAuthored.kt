@@ -1,5 +1,6 @@
 package com.example.tuicodewars.presentation.view_models
 
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tuicodewars.data.model.authored.Authored
@@ -34,4 +35,7 @@ class ViewModelAuthored @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
+
+    val scrollState = LazyListState()
+
 }

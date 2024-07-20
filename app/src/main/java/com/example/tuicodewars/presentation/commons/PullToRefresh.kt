@@ -6,6 +6,9 @@ import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
+/*
+Simple pull to refresh builder
+ */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun PullToRefresh(

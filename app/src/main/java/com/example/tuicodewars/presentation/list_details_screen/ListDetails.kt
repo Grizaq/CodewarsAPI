@@ -21,11 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
 import com.example.tuicodewars.data.model.authored.Data.Companion.toCommaSeparatedString
+import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.model.challenge.Challenge.Companion.shortenLongWords
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
@@ -49,6 +52,7 @@ fun ListDetails(
     }
     val uiState by viewModel.challengeData.collectAsState()
     val challengeData = uiState.data
+    val uriHandler = LocalUriHandler.current
     Scaffold(
         topBar = {
             AppsTopAppBar(
@@ -63,45 +67,7 @@ fun ListDetails(
             ) {
                 when (uiState) {
                     is Resource.Success -> {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.9f)
-                                    .verticalScroll(rememberScrollState())
-                            ) {
-                                Spacer(modifier = Modifier.height(24.dp))
-                                Text(
-                                    text = "${challengeData?.name}",
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
-                                if (challengeData?.totalAttempts != 0) {
-                                    val completionRate =
-                                        challengeData?.totalCompleted!!.toDouble() / challengeData.totalAttempts.toDouble() * 100
-                                    val formattedRate =
-                                        String.format(Locale.US, "%.2f", completionRate).toDouble()
-
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    Text(text = "Completion rate of: $formattedRate%")
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(text = "Languages: ${challengeData.languages.toCommaSeparatedString()}")
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Text(text = "Description: ${challengeData.description.shortenLongWords()}")
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Button(onClick = { }) {
-                                        Text(text = stringResource(R.string.btn_to_browser))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(16.dp))
-                            }
-                        }
+                        DetailsBody(challengeData, uriHandler)
                     }
 
                     is Resource.Loading -> {
@@ -124,5 +90,54 @@ fun ListDetails(
                     }
                 }
             }
-        })
+        }
+    )
+}
+
+@Composable
+private fun DetailsBody(
+    challengeData: Challenge?,
+    uriHandler: UriHandler
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(0.9f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "${challengeData?.name}",
+                style = MaterialTheme.typography.headlineMedium
+            )
+            if (challengeData?.totalAttempts != 0) {
+                val completionRate =
+                    challengeData?.totalCompleted!!.toDouble() / challengeData.totalAttempts.toDouble() * 100
+                val formattedRate =
+                    String.format(Locale.US, "%.2f", completionRate).toDouble()
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = "Completion rate of: $formattedRate%")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Languages: ${challengeData.languages.toCommaSeparatedString()}")
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Description: ${challengeData.description.shortenLongWords()}")
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(onClick = {
+                    uriHandler.openUri(challengeData.url)
+                }) {
+                    Text(text = stringResource(R.string.btn_to_browser))
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
 }

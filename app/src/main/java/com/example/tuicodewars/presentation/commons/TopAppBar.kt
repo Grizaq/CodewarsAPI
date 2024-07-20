@@ -9,13 +9,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,22 +30,34 @@ import androidx.compose.ui.unit.sp
 import com.example.tuicodewars.R
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-//@Preview(showBackground = true)
+/*
+Top app bar to be added to all pages for consistency, and on screen navigation
+Uses ComposeDestinations library's navigator
+ */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppsTopAppBar(pageName: String, navigator: DestinationsNavigator) {
+fun AppsTopAppBar(
+    pageName: String,
+    navigator: DestinationsNavigator
+) {
     val context = LocalContext.current
-    val eMail = stringResource(
-        R.string.message_about,
-        pageName
+    val eMailTopic = stringResource(
+        R.string.message_about, pageName
     )
     TopAppBar(
+        colors = TopAppBarColors(
+            containerColor = Color.Blue,
+            Color.Transparent,
+            Color.Transparent,
+            Color.White,
+            Color.Transparent
+        ),
         title = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Transparent)
-                    .offset(x = (-12).dp),
-                contentAlignment = Alignment.Center
+                    .offset(x = (-12).dp), contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -66,7 +80,10 @@ fun AppsTopAppBar(pageName: String, navigator: DestinationsNavigator) {
                         color = Color.White
                     )
                     IconButton(onClick = {
-                        context.sendMail(to = "example@gmail.com", subject = eMail)
+                        context.sendMail(
+                            to = "example@gmail.com", // To be adjusted to the required receiver e.g. support
+                            subject = eMailTopic // Autofill for e-mail subject
+                        )
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,

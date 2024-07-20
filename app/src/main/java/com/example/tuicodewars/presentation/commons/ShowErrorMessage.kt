@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,8 +16,15 @@ import androidx.compose.ui.text.style.TextAlign
 import com.example.tuicodewars.R
 import com.example.tuicodewars.presentation.ui.theme.Dimensions
 
+/*
+Error message for failed API response requests, with built in reload
+reload: () -> Unit - reload function to call the api response
+ */
 @Composable
-fun ShowErrorMessage(message: String, reload: () -> Unit) {
+fun ShowErrorMessage(
+    message: String,
+    reload: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column {
             Text(
