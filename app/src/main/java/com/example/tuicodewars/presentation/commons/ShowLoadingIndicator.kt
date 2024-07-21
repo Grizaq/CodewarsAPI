@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.example.tuicodewars.presentation.ui.theme.Dimensions
 
 /*
 Simple loading indicator for the network response Loading state
@@ -18,7 +18,8 @@ Simple loading indicator for the network response Loading state
 @Composable
 fun ShowLoadingIndicator() {
     Box(
-        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -26,7 +27,8 @@ fun ShowLoadingIndicator() {
             modifier = Modifier.fillMaxSize()
         ) {
             Text(
-                text = "Hold tight, it's Loading!", modifier = Modifier.padding(bottom = 16.dp)
+                text = "Hold tight, it's Loading!",
+                modifier = Modifier.padding(bottom = Dimensions.paddingMedium)
             )
             CircularProgressIndicator()
         }

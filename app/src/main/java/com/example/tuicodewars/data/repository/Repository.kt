@@ -9,5 +9,5 @@ import kotlinx.coroutines.flow.Flow
 interface Repository {
     suspend fun getItemsList(): Flow<Resource<DataJhoffner>>
     suspend fun getAuthoredList(): Flow<Resource<Authored>>
-    suspend fun getChallengeData(id : String): Flow<Resource<Challenge>>
+    suspend fun getChallengeData(id: String): Flow<Resource<Challenge>>
 }

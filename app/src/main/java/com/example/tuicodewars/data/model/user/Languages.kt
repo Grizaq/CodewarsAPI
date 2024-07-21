@@ -16,7 +16,7 @@ data class Languages(
     val shell: Shell,
     val sql: Sql,
     val typescript: Typescript
-){
+) {
     companion object {
         fun getLanguageNames(languages: Languages): List<String> {
             return languages::class.memberProperties.map { it.name }

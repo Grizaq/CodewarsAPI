@@ -6,7 +6,14 @@ import org.junit.Test
 
 class DataTest {
     private val listStrings = listOf(
-        "apple", "banana", "cherry", "date", "elderberry", "fig", "grape", "honeydew"
+        "apple",
+        "banana",
+        "cherry",
+        "date",
+        "elderberry",
+        "fig",
+        "grape",
+        "honeydew"
     )
     private val listStringsSeparated =
         "apple, banana, cherry, date, elderberry, fig, grape, honeydew"

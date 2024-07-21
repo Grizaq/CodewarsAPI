@@ -4,13 +4,13 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,11 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
 import com.example.tuicodewars.data.model.authored.Data.Companion.toCommaSeparatedString
@@ -34,6 +35,8 @@ import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
+import com.example.tuicodewars.presentation.commons.SpacerHeight
+import com.example.tuicodewars.presentation.ui.theme.Dimensions
 import com.example.tuicodewars.presentation.view_models.ViewModelChallengeData
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -62,8 +65,7 @@ fun ListDetails(
         },
         content = { padding ->
             Box(
-                modifier = Modifier
-                    .padding(padding)
+                modifier = Modifier.padding(padding)
             ) {
                 when (uiState) {
                     is Resource.Success -> {
@@ -78,7 +80,8 @@ fun ListDetails(
                         uiState.message?.let {
                             ShowErrorMessage(
                                 message = it,
-                                reload = { viewModel.getChallengeData("asd") })
+                                reload = { viewModel.getChallengeData(challengeId) }
+                            )
                         }
                         val messageReload = stringResource(R.string.standard_reload_error_message)
                         LaunchedEffect(key1 = "") {
@@ -95,49 +98,55 @@ fun ListDetails(
 }
 
 @Composable
-private fun DetailsBody(
-    challengeData: Challenge?,
-    uriHandler: UriHandler
-) {
-    Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
+private fun DetailsBody(challengeData: Challenge?, uriHandler: UriHandler) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(0.9f)
+                .fillMaxWidth(Dimensions.fillDefault)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            SpacerHeight(height = Dimensions.spacerMedium)
             Text(
                 text = "${challengeData?.name}",
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
             )
             if (challengeData?.totalAttempts != 0) {
                 val completionRate =
                     challengeData?.totalCompleted!!.toDouble() / challengeData.totalAttempts.toDouble() * 100
-                val formattedRate =
-                    String.format(Locale.US, "%.2f", completionRate).toDouble()
+                val formattedRate = String.format(Locale.US, "%.2f", completionRate).toDouble()
 
-                Spacer(modifier = Modifier.height(16.dp))
+                SpacerHeight(height = Dimensions.spacerMedium)
                 Text(text = "Completion rate of: $formattedRate%")
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            SpacerHeight(height = Dimensions.spacerMedium)
             Text(text = "Languages: ${challengeData.languages.toCommaSeparatedString()}")
-            Spacer(modifier = Modifier.height(16.dp))
+            SpacerHeight(height = Dimensions.spacerMedium)
             Text(text = "Description: ${challengeData.description.shortenLongWords()}")
-            Spacer(modifier = Modifier.height(16.dp))
+            SpacerHeight(height = Dimensions.spacerMedium)
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = {
-                    uriHandler.openUri(challengeData.url)
-                }) {
-                    Text(text = stringResource(R.string.btn_to_browser))
+                Button(
+                    onClick = {
+                        uriHandler.openUri(challengeData.url)
+                    },
+                    colors = ButtonColors(
+                        Color.Blue,
+                        contentColor = Color.White,
+                        disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),
+                        disabledContentColor = contentColor.copy(alpha = Dimensions.contentColor)
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.btn_to_browser),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = Dimensions.buttonTextSize
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            SpacerHeight(height = Dimensions.spacerMedium)
         }
     }
 }

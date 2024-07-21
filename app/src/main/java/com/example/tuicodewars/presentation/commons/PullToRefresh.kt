@@ -11,14 +11,6 @@ Simple pull to refresh builder
  */
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
-fun PullToRefresh(
-    isRefreshing: Boolean,
-    pullRefreshState: PullRefreshState,
-    modifier: Modifier
-) {
-    PullRefreshIndicator(
-        refreshing = isRefreshing,
-        state = pullRefreshState,
-        modifier = modifier
-    )
+fun PullToRefresh(isRefreshing: Boolean, pullRefreshState: PullRefreshState, modifier: Modifier) {
+    PullRefreshIndicator(refreshing = isRefreshing, state = pullRefreshState, modifier = modifier)
 }

@@ -6,8 +6,8 @@ import org.junit.Test
 
 class ChallengeTest {
     private val initialText =
-        "some sentence which has one veeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrryyyyyyyyyyy long words"
-    private val resultText = "some sentence which has one veeee[...]yyyyy long words"
+        "some sentence which has one veeeeeeeeeeeeeeeeeeeeryyyy long words"
+    private val resultText = "some sentence which has one veeee[...]ryyyy long words"
     private val textWithNoLongWords = "some sentence with no long words"
 
     @Test

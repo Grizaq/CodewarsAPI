@@ -29,5 +29,4 @@ class ViewModelChallengeData @Inject constructor(
             _challengeData.emit(it)
         }
     }
-
 }

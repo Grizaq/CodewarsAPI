@@ -21,20 +21,21 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideHttpInterceptor() =
-        HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+    fun provideHttpInterceptor() = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor) =
-        OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .connectTimeout(1, TimeUnit.SECONDS) // Short timeout for emulator bug where API response is in loading for too long
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
+    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor) = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(
+            1,
+            TimeUnit.SECONDS
+        ) // Short timeout for emulator bug where API response is in loading for too long
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
 
     @Provides
     @Singleton

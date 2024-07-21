@@ -25,9 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.tuicodewars.R
+import com.example.tuicodewars.presentation.ui.theme.Dimensions
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 /*
@@ -36,13 +35,11 @@ Uses ComposeDestinations library's navigator
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppsTopAppBar(
-    pageName: String,
-    navigator: DestinationsNavigator
-) {
+fun AppsTopAppBar(pageName: String, navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val eMailTopic = stringResource(
-        R.string.message_about, pageName
+        R.string.message_about,
+        pageName
     )
     TopAppBar(
         colors = TopAppBarColors(
@@ -57,7 +54,8 @@ fun AppsTopAppBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Transparent)
-                    .offset(x = (-12).dp), contentAlignment = Alignment.Center
+                    .offset(x = Dimensions.scaffoldOffset),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -66,33 +64,33 @@ fun AppsTopAppBar(
                     IconButton(onClick = { navigator.navigateUp() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc),
+                            contentDescription = stringResource(R.string.back_button_desc)
                         )
                     }
                     Text(
                         text = pageName,
                         maxLines = 1,
                         modifier = Modifier
-                            .fillMaxWidth(.9f)
+                            .fillMaxWidth(Dimensions.fillDefault)
                             .background(Color.Transparent),
                         textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
+                        fontSize = Dimensions.scaffoldTextSize,
                         color = Color.White
                     )
                     IconButton(onClick = {
                         context.sendMail(
-                            to = "example@gmail.com", // To be adjusted to the required receiver e.g. support
+                            to = "example@gmail.com", // To be adjusted e.g. support
                             subject = eMailTopic // Autofill for e-mail subject
                         )
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = stringResource(R.string.back_button_desc),
+                            contentDescription = stringResource(R.string.back_button_desc)
                         )
                     }
                 }
             }
-        },
+        }
     )
 }
 

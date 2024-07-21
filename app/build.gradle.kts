@@ -3,10 +3,10 @@ import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    //    kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "1.8.0-1.0.8"
     id("org.jetbrains.kotlin.kapt")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 kotlin {
@@ -68,7 +68,6 @@ android {
 
 tasks.withType(type = KaptGenerateStubsTask::class) {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
-
 }
 
 dependencies {
@@ -88,44 +87,48 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    testImplementation ("androidx.arch.core:core-testing:2.2.0")
-    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    //MockK
-    testImplementation ("io.mockk:mockk:1.13.2")
-    androidTestImplementation ("io.mockk:mockk-android:1.13.2")
-
-    //compose destination
-    implementation ("io.github.raamcosta.compose-destinations:core:1.7.27-beta")
-    ksp ("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")
-
-    //dagger-hilt
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    //  MockK
+    testImplementation("io.mockk:mockk:1.13.2")
+    androidTestImplementation("io.mockk:mockk-android:1.13.2")
+    //  compose destination
+    implementation("io.github.raamcosta.compose-destinations:core:1.7.27-beta")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")
+    //  dagger-hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation ("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
-
-    //retrofit
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    //gson
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.20")
+    //  retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    //  gson
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // Okhttp
-    implementation ("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
-    implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
-
-    //coroutine
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-    //lifecycle-compose
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-
-    //fragment ktx for ViewModel injection
-    implementation ("androidx.fragment:fragment-ktx:1.8.1")
-
-
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
+    //  coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    //  lifecycle-compose
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    //  fragment ktx for ViewModel injection
+    implementation("androidx.fragment:fragment-ktx:1.8.1")
     // swipe refresh
-    implementation ("androidx.compose.material:material:1.6.8")
+    implementation("androidx.compose.material:material:1.6.8")
 }
 
 kapt {
     correctErrorTypes = true
+}
+
+ktlint {
+    android.set(true)
+    outputToConsole.set(true)
+    outputColorName.set("RED")
+    ignoreFailures.set(false)
+    enableExperimentalRules.set(true)
+    reporters {
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.PLAIN)
+        reporter(org.jlleitschuh.gradle.ktlint.reporter.ReporterType.CHECKSTYLE)
+    }
 }

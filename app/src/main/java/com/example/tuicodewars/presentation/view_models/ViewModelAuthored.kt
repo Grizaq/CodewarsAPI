@@ -37,5 +37,4 @@ class ViewModelAuthored @Inject constructor(
         get() = _isRefreshing.asStateFlow()
 
     val scrollState = LazyListState()
-
 }

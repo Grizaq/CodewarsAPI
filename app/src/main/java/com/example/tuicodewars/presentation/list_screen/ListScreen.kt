@@ -8,10 +8,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,9 +22,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -44,8 +44,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
@@ -56,7 +56,9 @@ import com.example.tuicodewars.presentation.commons.AppsTopAppBar
 import com.example.tuicodewars.presentation.commons.PullToRefresh
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
+import com.example.tuicodewars.presentation.commons.SpacerHeight
 import com.example.tuicodewars.presentation.destinations.ListDetailsDestination
+import com.example.tuicodewars.presentation.ui.theme.Dimensions
 import com.example.tuicodewars.presentation.view_models.ViewModelAuthored
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -78,65 +80,77 @@ fun ListScreen(
     val scope = rememberCoroutineScope()
     val listState = viewModel.scrollState
 
-    Scaffold(topBar = {
-        AppsTopAppBar(
-            pageName = stringResource(R.string.scaffold_text_authored_list), navigator = navigator
-        )
-    }, content = { padding ->
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .pullRefresh(pullRefreshState)
-        ) {
-            when (uiState) {
-                is Resource.Success -> {
-                    ListBody(challengesList, navigator, viewModel)
-                    PullToRefresh(
-                        isRefreshing = isRefreshing,
-                        pullRefreshState = pullRefreshState,
-                        Modifier.align(Alignment.TopCenter)
-                    )
-                    ScrollToTopButton(lazyListState = listState, scope = scope)
-                }
-
-                is Resource.Loading -> {
-                    ShowLoadingIndicator()
-                }
-
-                is Resource.Error -> {
-                    uiState.message?.let {
-                        ShowErrorMessage(message = it, reload = { viewModel.getAuthoredList() })
+    Scaffold(
+        topBar = {
+            AppsTopAppBar(
+                pageName = stringResource(R.string.scaffold_text_authored_list),
+                navigator = navigator
+            )
+        },
+        content = { padding ->
+            Box(
+                modifier = Modifier
+                    .padding(padding)
+                    .pullRefresh(pullRefreshState)
+            ) {
+                when (uiState) {
+                    is Resource.Success -> {
+                        ListBody(challengesList, navigator, viewModel)
+                        PullToRefresh(
+                            isRefreshing = isRefreshing,
+                            pullRefreshState = pullRefreshState,
+                            Modifier.align(Alignment.TopCenter)
+                        )
+                        ScrollToTopButton(lazyListState = listState, scope = scope)
                     }
-                    val messageReload = stringResource(R.string.standard_reload_error_message)
-                    LaunchedEffect(key1 = "") {
-                        delay(5 * 1000)
-                        viewModel.getAuthoredList()
-                        Log.i("MainScreen", messageReload)
+
+                    is Resource.Loading -> {
+                        ShowLoadingIndicator()
+                    }
+
+                    is Resource.Error -> {
+                        uiState.message?.let {
+                            ShowErrorMessage(message = it, reload = { viewModel.getAuthoredList() })
+                        }
+                        val messageReload = stringResource(R.string.standard_reload_error_message)
+                        LaunchedEffect(key1 = "") {
+                            delay(5 * 1000)
+                            viewModel.getAuthoredList()
+                            Log.i("MainScreen", messageReload)
+                        }
                     }
                 }
             }
         }
-    })
+    )
 }
 
 @Composable
 private fun ListBody(
-    challengesList: List<Data>, navigator: DestinationsNavigator, viewModel: ViewModelAuthored
+    challengesList: List<Data>,
+    navigator: DestinationsNavigator,
+    viewModel: ViewModelAuthored
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         state = viewModel.scrollState
     ) {
         items(challengesList) { item ->
-            Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        vertical = Dimensions.paddingXSmall,
+                        horizontal = Dimensions.paddingMedium
+                    ),
+                elevation = CardDefaults.cardElevation(Dimensions.elevationMedium),
                 onClick = {
                     navigator.navigate(ListDetailsDestination(challengeId = item.id))
-                }) {
+                }
+            ) {
                 Box(
-                    modifier = Modifier.padding(16.dp), contentAlignment = Alignment.Center
+                    modifier = Modifier.padding(Dimensions.paddingMedium),
+                    contentAlignment = Alignment.Center
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
@@ -145,21 +159,26 @@ private fun ListBody(
                         Text(
                             text = item.name,
                             textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.headlineSmall
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        SpacerHeight(Dimensions.spacerSmall)
                         Text(
                             text = stringResource(
-                                R.string.list_rank, item.rank
+                                R.string.list_rank,
+                                item.rank
                             ),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.bodyLarge
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        SpacerHeight(Dimensions.spacerSmall)
                         Text(
                             text = stringResource(
-                                R.string.text_languages, item.languages.toCommaSeparatedString()
-                            ), textAlign = TextAlign.Center, fontStyle = FontStyle.Italic
+                                R.string.text_languages,
+                                item.languages.toCommaSeparatedString()
+                            ),
+                            textAlign = TextAlign.Center,
+                            fontStyle = FontStyle.Italic
                         )
                     }
                 }
@@ -168,10 +187,8 @@ private fun ListBody(
     }
 }
 
-
 @Composable
 fun ScrollToTopButton(lazyListState: LazyListState, scope: CoroutineScope) {
-
     val showButton by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex > 2 && !lazyListState.isScrollInProgress
@@ -180,25 +197,32 @@ fun ScrollToTopButton(lazyListState: LazyListState, scope: CoroutineScope) {
     AnimatedVisibility(
         visible = showButton,
         enter = fadeIn(),
-        exit = fadeOut(),
+        exit = fadeOut()
     ) {
         Box(
             Modifier
                 .fillMaxSize()
-                .padding(bottom = 20.dp), Alignment.BottomCenter
+                .padding(bottom = Dimensions.paddingLarge),
+            Alignment.BottomCenter
         ) {
             Button(
                 onClick = { scope.launch { lazyListState.animateScrollToItem(0) } },
                 modifier = Modifier
-                    .shadow(10.dp, shape = CircleShape)
-                    .size(65.dp),
-                contentPadding = PaddingValues(8.dp)
+                    .shadow(Dimensions.shadowMedium, shape = CircleShape)
+                    .size(Dimensions.toTopButtonSize),
+                contentPadding = PaddingValues(Dimensions.paddingXSmall),
+                colors = ButtonColors(
+                    Color.Blue,
+                    contentColor = Color.White,
+                    disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),
+                    disabledContentColor = contentColor.copy(alpha = Dimensions.contentColor)
+                )
             ) {
                 Icon(
                     Icons.Filled.KeyboardArrowUp,
                     contentDescription = "arrow up",
                     tint = Color.White,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(Dimensions.toTopArrowSize)
                 )
             }
         }

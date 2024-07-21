@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,28 +20,36 @@ import com.example.tuicodewars.presentation.ui.theme.Dimensions
 
 /*
 Error message for failed API response requests, with built in reload
-reload: () -> Unit - reload function to call the api response
+param - reload: () -> Unit - reload function to call the api response
  */
 @Composable
-fun ShowErrorMessage(
-    message: String,
-    reload: () -> Unit
-) {
+fun ShowErrorMessage(message: String, reload: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column {
             Text(
                 text = stringResource(R.string.it_will_reload_soon, message),
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.displaySmall,
                 textAlign = TextAlign.Center
             )
+            SpacerHeight(height = Dimensions.spacerMedium)
             Box(modifier = Modifier.fillMaxWidth()) {
                 Button(
                     onClick = { reload() },
+                    colors = ButtonColors(
+                        Color.Blue,
+                        contentColor = Color.White,
+                        disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),
+                        disabledContentColor = contentColor.copy(alpha = Dimensions.contentColor)
+                    ),
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .fillMaxWidth(Dimensions.centerButtonWidth),
+                        .fillMaxWidth(Dimensions.centerButtonWidth)
                 ) {
-                    Text(text = stringResource(R.string.reload_text), color = Color.White)
+                    Text(
+                        text = stringResource(R.string.reload_text),
+                        color = Color.White,
+                        fontSize = Dimensions.buttonTextSize
+                    )
                 }
             }
         }

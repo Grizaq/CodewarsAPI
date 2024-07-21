@@ -37,7 +37,6 @@ class RepositoryJhoffner @Inject constructor(private val api: API) : Repository 
         emit(Resource.Loading())
         try {
             val response = api.getAuthoredList()
-
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(Resource.Success(it))
@@ -54,11 +53,10 @@ class RepositoryJhoffner @Inject constructor(private val api: API) : Repository 
         }
     }
 
-    override suspend fun getChallengeData(id : String): Flow<Resource<Challenge>> = flow {
+    override suspend fun getChallengeData(id: String): Flow<Resource<Challenge>> = flow {
         emit(Resource.Loading())
         try {
             val response = api.getChallengeData(id = id)
-
             if (response.isSuccessful) {
                 response.body()?.let {
                     emit(Resource.Success(it))
