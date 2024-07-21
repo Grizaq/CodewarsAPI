@@ -111,8 +111,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     //  lifecycle-compose
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-    //  fragment ktx for ViewModel injection
-    implementation("androidx.fragment:fragment-ktx:1.8.1")
     // swipe refresh
     implementation("androidx.compose.material:material:1.6.8")
 }
