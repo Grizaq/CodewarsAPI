@@ -3,7 +3,7 @@ package com.example.tuicodewars.presentation.view_models
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tuicodewars.data.model.user.DataJhoffner
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

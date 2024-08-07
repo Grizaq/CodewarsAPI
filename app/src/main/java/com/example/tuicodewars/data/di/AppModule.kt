@@ -1,9 +1,9 @@
 package com.example.tuicodewars.data.di
 
 import com.example.tuicodewars.data.remote.API
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.data.utils.Utils.BASE_URL
-import com.example.tuicodewars.domain.repository.RepositoryJhoffner
+import com.example.tuicodewars.data.repository.RepositoryJhoffner
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

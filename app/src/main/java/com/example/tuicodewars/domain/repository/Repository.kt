@@ -1,4 +1,4 @@
-package com.example.tuicodewars.data.repository
+package com.example.tuicodewars.domain.repository
 
 import com.example.tuicodewars.data.model.authored.Authored
 import com.example.tuicodewars.data.model.challenge.Challenge

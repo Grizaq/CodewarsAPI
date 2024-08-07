@@ -1,10 +1,10 @@
-package com.example.tuicodewars.domain.repository
+package com.example.tuicodewars.data.repository
 
 import com.example.tuicodewars.data.model.authored.Authored
 import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.model.user.DataJhoffner
 import com.example.tuicodewars.data.remote.API
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

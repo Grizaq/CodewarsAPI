@@ -3,7 +3,7 @@ package com.example.tuicodewars.presentation.view_models
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.tuicodewars.data.model.authored.Authored
 import com.example.tuicodewars.data.model.authored.Data
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify

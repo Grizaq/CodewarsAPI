@@ -4,7 +4,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tuicodewars.data.model.authored.Authored
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

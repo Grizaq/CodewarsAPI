@@ -19,7 +19,7 @@ import com.example.tuicodewars.data.model.user.Ruby
 import com.example.tuicodewars.data.model.user.Shell
 import com.example.tuicodewars.data.model.user.Sql
 import com.example.tuicodewars.data.model.user.Typescript
-import com.example.tuicodewars.data.repository.Repository
+import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
