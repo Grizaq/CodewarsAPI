@@ -1,7 +1,7 @@
 # TuiCodewars
 Project Overview:
 
-This project is built for Tui coding challenge, with API provided by CodeWars, for the position #2 on the leaderboard - jhoffner, uses the MVVM architecture, adhering to the principles of clean architecture. It leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations. The project includes robust loading state handling to ensure a smooth user experience during data fetching.
+This project is built with API provided by CodeWars, for the position #2 on the leaderboard - jhoffner, uses the MVVM architecture, adhering to the principles of clean architecture. It leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations. The project includes robust loading state handling to ensure a smooth user experience during data fetching.
 
 Key Libraries:
 
