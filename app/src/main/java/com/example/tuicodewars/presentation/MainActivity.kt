@@ -14,7 +14,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             TuiCodewarsTheme {
                 DestinationsNavHost(navGraph = NavGraphs.root)
-                // for testing
             }
         }
     }

@@ -4,11 +4,13 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.tuicodewars.data.model.authored.Authored
 import com.example.tuicodewars.data.model.authored.Data
 import com.example.tuicodewars.domain.repository.Repository
+import com.example.tuicodewars.domain.usecases.CheckNetworkUseCase
 import com.example.tuicodewars.domain.utils.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,12 +36,13 @@ class ViewModelAuthoredTest {
     private val testScope = TestScope(testDispatcher)
     private val repository =
         mockk<Repository>(relaxed = true)
-    private lateinit var viewModel: ViewModelAuthored
+    private lateinit var viewModel: ViewModelAuthoredList
+    private val checkNetworkUseCase:CheckNetworkUseCase = mockk()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ViewModelAuthored(repository)
+        viewModel = ViewModelAuthoredList(repository, checkNetworkUseCase)
     }
 
     @After
@@ -60,7 +63,6 @@ class ViewModelAuthoredTest {
             )
 
             expected is Resource.Loading && actual is Resource.Loading ->
-                // just check they are both instances of Loading
                 assertTrue(actual is Resource.Loading)
 
             else -> assertEquals(expected, actual)
@@ -123,4 +125,51 @@ class ViewModelAuthoredTest {
         testScope.advanceUntilIdle() // Ensure all coroutines are completed
         coVerify { repository.getAuthoredList() }
     }
+
+    @Test
+    fun `test refreshData when internet is available`() = runTest {
+        coEvery { checkNetworkUseCase.isInternetAvailable() } returns true
+        coEvery { repository.getAuthoredList() } returns flowOf(Resource.Success(mockk()))
+
+        viewModel.refreshData()
+
+        // Verify that getAuthoredList was called
+        coVerify { repository.getAuthoredList() }
+
+        // Verify that the banner is not shown and refreshing is set to false
+        assertFalse(viewModel.bannerStateShow.value)
+        assertFalse(viewModel.isRefreshingList.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
+    }
+
+    @Test
+    fun `test refreshData when internet is not available`() = runTest {
+        coEvery { checkNetworkUseCase.isInternetAvailable() } returns false
+
+        viewModel.refreshData()
+
+        // Verify that the banner is shown and refreshing is set to false
+        assertTrue(viewModel.bannerStateShow.value)
+        assertFalse(viewModel.isRefreshingList.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
+    }
+
+    @Test
+    fun `test hideBanner`() = runTest {
+        // Set the banner to true before calling hideBanner
+        viewModel._bannerStateShow.value = true
+
+        viewModel.hideBanner()
+
+        // Verify that the banner is hidden
+        assertFalse(viewModel.bannerStateShow.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
+    }
 }
+

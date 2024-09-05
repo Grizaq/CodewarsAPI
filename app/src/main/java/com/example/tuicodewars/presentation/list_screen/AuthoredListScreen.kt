@@ -1,6 +1,5 @@
 package com.example.tuicodewars.presentation.list_screen
 
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -31,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -53,32 +51,33 @@ import com.example.tuicodewars.data.model.authored.Data
 import com.example.tuicodewars.data.model.authored.Data.Companion.toCommaSeparatedString
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
+import com.example.tuicodewars.presentation.commons.Banner
 import com.example.tuicodewars.presentation.commons.PullToRefresh
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
 import com.example.tuicodewars.presentation.commons.SpacerHeight
 import com.example.tuicodewars.presentation.destinations.ListDetailsDestination
 import com.example.tuicodewars.presentation.ui.theme.Dimensions
-import com.example.tuicodewars.presentation.view_models.ViewModelAuthored
+import com.example.tuicodewars.presentation.view_models.ViewModelAuthoredList
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Destination
 @Composable
 fun ListScreen(
-    viewModel: ViewModelAuthored = viewModel(LocalContext.current as ComponentActivity),
+    viewModel: ViewModelAuthoredList = viewModel(LocalContext.current as ComponentActivity),
     navigator: DestinationsNavigator
 ) {
     val uiState by viewModel.authoredList.collectAsState()
     val challengesList = uiState.data?.data ?: emptyList()
-    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, { viewModel.getAuthoredList() })
+    val isRefreshing by viewModel.isRefreshingList.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { viewModel.refreshData() })
     val scope = rememberCoroutineScope()
     val listState = viewModel.scrollState
+    val bannerStateShow by viewModel.bannerStateShow.collectAsState()
 
     Scaffold(
         topBar = {
@@ -88,37 +87,47 @@ fun ListScreen(
             )
         },
         content = { padding ->
-            Box(
+            Column(
                 modifier = Modifier
                     .padding(padding)
-                    .pullRefresh(pullRefreshState)
+                    .fillMaxSize()
             ) {
-                when (uiState) {
-                    is Resource.Success -> {
-                        ListBody(challengesList, navigator, viewModel)
-                        PullToRefresh(
-                            isRefreshing = isRefreshing,
-                            pullRefreshState = pullRefreshState,
-                            Modifier.align(Alignment.TopCenter)
-                        )
-                        ScrollToTopButton(lazyListState = listState, scope = scope)
-                    }
-
-                    is Resource.Loading -> {
-                        ShowLoadingIndicator()
-                    }
-
-                    is Resource.Error -> {
-                        uiState.message?.let {
-                            ShowErrorMessage(message = it, reload = { viewModel.getAuthoredList() })
+                // Banner showing data loaded from local storage
+                if (bannerStateShow) {
+                    Banner(
+                        message = stringResource(R.string.banner_no_internet),
+                        onDismiss = { viewModel.hideBanner() }
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pullRefresh(pullRefreshState)
+                ) {
+                    when (uiState) {
+                        is Resource.Success, is Resource.LocalData -> {
+                            ListBody(challengesList, navigator, viewModel)
+                            ScrollToTopButton(lazyListState = listState, scope = scope)
                         }
-                        val messageReload = stringResource(R.string.standard_reload_error_message)
-                        LaunchedEffect(key1 = "") {
-                            delay(5 * 1000)
-                            viewModel.getAuthoredList()
-                            Log.i("MainScreen", messageReload)
+
+                        is Resource.Loading -> {
+                            ShowLoadingIndicator()
+                        }
+
+                        is Resource.Error -> {
+                            uiState.message?.let {
+                                ShowErrorMessage(
+                                    message = it,
+                                    reload = { viewModel.refreshData() }
+                                )
+                            }
                         }
                     }
+                    PullToRefresh(
+                        isRefreshing = isRefreshing,
+                        pullRefreshState = pullRefreshState,
+                        Modifier.align(Alignment.TopCenter)
+                    )
                 }
             }
         }
@@ -129,7 +138,7 @@ fun ListScreen(
 private fun ListBody(
     challengesList: List<Data>,
     navigator: DestinationsNavigator,
-    viewModel: ViewModelAuthored
+    viewModel: ViewModelAuthoredList
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

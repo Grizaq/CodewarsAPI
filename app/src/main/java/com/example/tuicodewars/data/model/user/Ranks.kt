@@ -1,6 +1,5 @@
 package com.example.tuicodewars.data.model.user
 
 data class Ranks(
-    val languages: Languages,
-    val overall: Overall
+    val languages: Map<String, LanguageDetails> = emptyMap()
 )

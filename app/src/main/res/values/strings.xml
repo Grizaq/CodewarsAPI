@@ -18,5 +18,6 @@
     <string name="scaffold_text_greeting_screen">Greeting Screen</string>
     <string name="scaffold_text_authored_list">Authored List</string>
     <string name="scaffold_text_challenge_details">Challenge details</string>
+    <string name="banner_no_internet">Local data powered! check the internet</string>
 
 </resources>

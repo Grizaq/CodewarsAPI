@@ -1,34 +1,27 @@
 package com.example.tuicodewars.domain.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.example.tuicodewars.data.local.dao.authored.AuthoredDao
+import com.example.tuicodewars.data.local.dao.challenge.ChallengeDao
+import com.example.tuicodewars.data.local.dao.user.DataJhoffnerDao
 import com.example.tuicodewars.data.model.authored.Authored
 import com.example.tuicodewars.data.model.authored.Data
 import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.model.user.CodeChallenges
-import com.example.tuicodewars.data.model.user.Coffeescript
-import com.example.tuicodewars.data.model.user.Crystal
-import com.example.tuicodewars.data.model.user.Csharp
 import com.example.tuicodewars.data.model.user.DataJhoffner
-import com.example.tuicodewars.data.model.user.Elixir
-import com.example.tuicodewars.data.model.user.Haskell
-import com.example.tuicodewars.data.model.user.Java
-import com.example.tuicodewars.data.model.user.Javascript
-import com.example.tuicodewars.data.model.user.Languages
-import com.example.tuicodewars.data.model.user.Objc
-import com.example.tuicodewars.data.model.user.Overall
-import com.example.tuicodewars.data.model.user.Python
+import com.example.tuicodewars.data.model.user.LanguageDetails
 import com.example.tuicodewars.data.model.user.Ranks
-import com.example.tuicodewars.data.model.user.Ruby
-import com.example.tuicodewars.data.model.user.Shell
-import com.example.tuicodewars.data.model.user.Sql
-import com.example.tuicodewars.data.model.user.Typescript
 import com.example.tuicodewars.data.remote.API
 import com.example.tuicodewars.data.repository.RepositoryJhoffner
+import com.example.tuicodewars.domain.utils.NetworkChecker
 import com.example.tuicodewars.domain.utils.Resource
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -50,36 +43,31 @@ class RepositoryJhoffnerTest {
     val instantExecutorRule = InstantTaskExecutorRule()
 
     private val testDispatcher = UnconfinedTestDispatcher()
-    private val api = mockk<API>()
+    private val api: API = mockk()
+    private val dataJhoffnerDao: DataJhoffnerDao = mockk()
+    private val authoredDao: AuthoredDao = mockk()
+    private val challengeDao: ChallengeDao = mockk()
+    private val networkChecker: NetworkChecker = mockk()
     private lateinit var repository: RepositoryJhoffner
 
-    private val mockLanguages = Languages(
-        coffeescript = Coffeescript(rank = -4, name = "4 kyu", color = "blue", score = 903),
-        java = Java(rank = -6, name = "6 kyu", color = "yellow", score = 100),
-        haskell = Haskell(rank = -6, name = "6 kyu", color = "yellow", score = 126),
-        typescript = Typescript(rank = -7, name = "7 kyu", color = "white", score = 22),
-        csharp = Csharp(rank = -6, name = "6 kyu", color = "yellow", score = 90),
-        crystal = Crystal(rank = -8, name = "8 kyu", color = "white", score = 4),
-        javascript = Javascript(rank = -3, name = "3 kyu", color = "blue", score = 2683),
-        ruby = Ruby(rank = -3, name = "3 kyu", color = "blue", score = 1906),
-        python = Python(rank = -5, name = "5 kyu", color = "yellow", score = 357),
-        elixir = Elixir(rank = -8, name = "8 kyu", color = "white", score = 2),
-        sql = Sql(rank = -6, name = "6 kyu", color = "yellow", score = 86),
-        shell = Shell(rank = -8, name = "8 kyu", color = "white", score = 5),
-        objc = Objc(rank = -8, name = "8 kyu", color = "white", score = 4)
-    )
-
-    private val mockOverall = Overall(
-        color = "blue",
-        name = "3 kyu",
-        rank = -3,
-        score = 2683
+    private val mockLocalData = DataJhoffner(
+        id = "1",
+        codeChallenges = CodeChallenges(totalAuthored = 5, totalCompleted = 10),
+        name = "Test Name",
+        ranks = Ranks(
+            languages = mapOf(
+                "Kotlin" to LanguageDetails("blue", "Kotlin", 1, 1000),
+                "Java" to LanguageDetails("red", "Java", 2, 800)
+            )
+        )
     )
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = RepositoryJhoffner(api)
+        repository =
+            RepositoryJhoffner(api, dataJhoffnerDao, authoredDao, challengeDao, networkChecker)
+        coEvery { networkChecker.isInternetAvailable() } returns true
     }
 
     @After
@@ -87,84 +75,109 @@ class RepositoryJhoffnerTest {
         Dispatchers.resetMain()
     }
 
+    private fun mockGetDataJhoffner(data: DataJhoffner?) {
+        coEvery { dataJhoffnerDao.getDataJhoffner(any()) } returns data
+    }
+
+    private fun mockApiResponseForItemList(response: Response<DataJhoffner>) {
+        coEvery { api.getItemList() } returns response
+    }
+
+    private fun mockApiResponseForAuthoredList(response: Response<Authored>) {
+        coEvery { api.getAuthoredList() } returns response
+    }
+
+    private fun mockApiResponseForChallengeData(response: Response<Challenge>) {
+        coEvery { api.getChallengeData(any()) } returns response
+    }
+
     @Test
     fun `test getItemsList returns success`() = runTest {
-        val mockData = DataJhoffner(
-            codeChallenges = CodeChallenges(totalAuthored = 5, totalCompleted = 10),
-            name = "Test Name",
-            ranks = Ranks(mockLanguages, mockOverall),
-            skills = listOf("Skill1", "Skill2")
-        )
-        val mockResponse = Response.success(mockData)
-
-        coEvery { api.getItemList() } returns mockResponse
+        val mockData = mockLocalData
+        coEvery { dataJhoffnerDao.insertDataJhoffner(any()) } just Runs
+        mockGetDataJhoffner(mockData)
+        mockApiResponseForItemList(Response.success(mockData))
 
         val flow = repository.getItemsList()
-
         val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData
-        )
+
+        // Ensure there are at least two emissions from the flow
+        assert(emissions.size >= 2)
+
+        // Verify that the first emission is Resource.LocalData
+        val firstEmission = emissions[0]
+        assert(firstEmission is Resource.LocalData)
+
+        // Verify that the second emission is Resource.Success and contains the expected data
+        val secondEmission = emissions[1]
+        assert(secondEmission is Resource.Success)
+        assert((secondEmission as Resource.Success).data == mockData)
     }
 
     @Test
     fun `test getItemsList returns error`() = runTest {
-        val mockResponse = Response.error<DataJhoffner>(404, "Not Found".toResponseBody(null))
-
-        coEvery { api.getItemList() } returns mockResponse
-
-        val flow = repository.getItemsList()
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "404")
-    }
-
-    @Test
-    fun `test getItemsList returns empty body error`() = runTest {
-        val mockResponse = Response.success<DataJhoffner>(null)
-
-        coEvery { api.getItemList() } returns mockResponse
-
-        val flow = repository.getItemsList()
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body"
-        )
-    }
-
-    @Test
-    fun `test getItemsList handles http exception`() = runTest {
-        coEvery { api.getItemList() } throws HttpException(
-            Response.error<Any>(
-                500,
-                "Server Error".toResponseBody(null)
+        mockGetDataJhoffner(null)
+        mockApiResponseForItemList(
+            Response.error<DataJhoffner>(
+                404, "Not Found".toResponseBody(null)
             )
         )
 
         val flow = repository.getItemsList()
-
         val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Could not load data"
+
+        // Verify that the second emission is Resource.Error with the correct error message
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Remote server error: 404")
+    }
+
+    @Test
+    fun `test getItemsList returns empty body error`() = runTest {
+        mockGetDataJhoffner(null)
+        mockApiResponseForItemList(Response.success<DataJhoffner>(null))
+
+        val flow = repository.getItemsList()
+        val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for an empty body
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body")
+    }
+
+    @Test
+    fun `test getItemsList handles http exception`() = runTest {
+        mockGetDataJhoffner(null)
+        coEvery { api.getItemList() } throws HttpException(
+            Response.error<Any>(500, "Server Error".toResponseBody(null))
         )
+
+        val flow = repository.getItemsList()
+        val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for HTTP exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network error: Server Error")
     }
 
     @Test
     fun `test getItemsList handles io exception`() = runTest {
+        mockGetDataJhoffner(null)
         coEvery { api.getItemList() } throws IOException("Network Error")
 
         val flow = repository.getItemsList()
-
         val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Check internet"
-        )
+
+        // Verify that the second emission is Resource.Error with the correct error message for IO exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network failure: Network Error")
     }
 
     @Test
@@ -182,81 +195,90 @@ class RepositoryJhoffnerTest {
                 )
             )
         )
-        val mockResponse = Response.success(mockData)
-
-        coEvery { api.getAuthoredList() } returns mockResponse
+        coEvery { authoredDao.getAuthoredById() } returns flowOf(null)
+        mockApiResponseForAuthoredList(Response.success(mockData))
+        coEvery { authoredDao.insertAuthored(any()) } returns Unit
 
         val flow = repository.getAuthoredList()
-
         val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData
-        )
+
+        // Verify that the second emission is Resource.Success and contains the expected data
+        assert(emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData)
     }
 
     @Test
     fun `test getAuthoredList returns error`() = runTest {
-        val mockResponse = Response.error<Authored>(404, "Not Found".toResponseBody(null))
-
-        coEvery { api.getAuthoredList() } returns mockResponse
-
-        val flow = repository.getAuthoredList()
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "404")
-    }
-
-    @Test
-    fun `test getAuthoredList returns empty body error`() = runTest {
-        val mockResponse = Response.success<Authored>(null)
-
-        coEvery { api.getAuthoredList() } returns mockResponse
-
-        val flow = repository.getAuthoredList()
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body"
-        )
-    }
-
-    @Test
-    fun `test getAuthoredList handles http exception`() = runTest {
-        coEvery { api.getAuthoredList() } throws HttpException(
-            Response.error<Any>(
-                500,
-                "Server Error".toResponseBody(null)
+        coEvery { authoredDao.getAuthoredById() } returns flowOf()
+        mockApiResponseForAuthoredList(
+            Response.error<Authored>(
+                404, "Not Found".toResponseBody(null)
             )
         )
 
         val flow = repository.getAuthoredList()
-
         val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Could not load data"
+
+        // Verify that the second emission is Resource.Error with the correct error message
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Remote server error: 404")
+    }
+
+    @Test
+    fun `test getAuthoredList returns empty body error`() = runTest {
+        coEvery { authoredDao.getAuthoredById() } returns flowOf()
+        mockApiResponseForAuthoredList(Response.success<Authored>(null))
+
+        val flow = repository.getAuthoredList()
+        val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for an empty body
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body")
+    }
+
+    @Test
+    fun `test getAuthoredList handles http exception`() = runTest {
+        coEvery { authoredDao.getAuthoredById() } returns flowOf()
+        coEvery { api.getAuthoredList() } throws HttpException(
+            Response.error<Any>(500, "Server Error".toResponseBody(null))
         )
+
+        val flow = repository.getAuthoredList()
+        val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for HTTP exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network error: HTTP 500 Response.error()")
     }
 
     @Test
     fun `test getAuthoredList handles io exception`() = runTest {
+        coEvery { authoredDao.getAuthoredById() } returns flowOf()
         coEvery { api.getAuthoredList() } throws IOException("Network Error")
 
         val flow = repository.getAuthoredList()
-
         val emissions = flow.toList()
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Check internet"
-        )
+
+        // Verify that the second emission is Resource.Error with the correct error message for IO exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network failure: Network Error")
     }
 
     @Test
     fun `test getChallengeData returns success`() = runTest {
         val mockData = Challenge(
+            id = "5",
             description = "Test Challenge",
             languages = listOf("Kotlin", "Java"),
             name = "Challenge Name",
@@ -264,75 +286,98 @@ class RepositoryJhoffnerTest {
             totalCompleted = 5,
             url = "http://example.com"
         )
-        val mockResponse = Response.success(mockData)
-
-        coEvery { api.getChallengeData(any()) } returns mockResponse
+        coEvery { challengeDao.getChallengeById(any()) } returns flowOf()
+        mockApiResponseForChallengeData(Response.success(mockData))
+        coEvery { challengeDao.insertChallenge(any()) } returns Unit
 
         val flow = repository.getChallengeData("1")
-
         val emissions = flow.toList()
+
+        // Ensure there is at least one emission from the flow
+        assert(emissions.isNotEmpty())
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData
-        )
+
+        // Verify that the second emission is Resource.Success and contains the expected data
+        assert(emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData)
     }
 
     @Test
     fun `test getChallengeData returns error`() = runTest {
-        val mockResponse = Response.error<Challenge>(404, "Not Found".toResponseBody(null))
-
-        coEvery { api.getChallengeData(any()) } returns mockResponse
-
-        val flow = repository.getChallengeData("1")
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "404")
-    }
-
-    @Test
-    fun `test getChallengeData returns empty body error`() = runTest {
-        val mockResponse = Response.success<Challenge>(null)
-
-        coEvery { api.getChallengeData(any()) } returns mockResponse
-
-        val flow = repository.getChallengeData("1")
-
-        val emissions = flow.toList()
-        assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body"
-        )
-    }
-
-    @Test
-    fun `test getChallengeData handles http exception`() = runTest {
-        coEvery { api.getChallengeData(any()) } throws HttpException(
-            Response.error<Any>(
-                500,
-                "Server Error".toResponseBody(null)
+        coEvery { challengeDao.getChallengeById(any()) } returns flowOf()
+        mockApiResponseForChallengeData(
+            Response.error<Challenge>(
+                404, "Not Found".toResponseBody(null)
             )
         )
 
         val flow = repository.getChallengeData("1")
-
         val emissions = flow.toList()
+
+        // Ensure there is at least one emission from the flow
+        assert(emissions.isNotEmpty())
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Could not load data"
+
+        // Verify that the second emission is Resource.Error with the correct error message
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Remote server error: 404")
+    }
+
+    @Test
+    fun `test getChallengeData returns empty body error`() = runTest {
+        coEvery { challengeDao.getChallengeById(any()) } returns flowOf()
+        mockApiResponseForChallengeData(Response.success<Challenge>(null))
+
+        val flow = repository.getChallengeData("1")
+        val emissions = flow.toList()
+
+        // Ensure there is at least one emission from the flow
+        assert(emissions.isNotEmpty())
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for an empty body
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Empty response body")
+    }
+
+    @Test
+    fun `test getChallengeData handles http exception`() = runTest {
+        coEvery { challengeDao.getChallengeById(any()) } returns flowOf()
+        coEvery { api.getChallengeData(any()) } throws HttpException(
+            Response.error<Any>(500, "Server Error".toResponseBody(null))
         )
+
+        val flow = repository.getChallengeData("1")
+        val emissions = flow.toList()
+
+        // Ensure there is at least one emission from the flow
+        assert(emissions.isNotEmpty())
+
+        // Ensure the first emission is Resource.Loading
+        assert(emissions[0] is Resource.Loading)
+
+        // Verify that the second emission is Resource.Error with the correct error message for HTTP exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network error: HTTP 500 Response.error()")
     }
 
     @Test
     fun `test getChallengeData handles io exception`() = runTest {
+        coEvery { challengeDao.getChallengeById(any()) } returns flowOf()
         coEvery { api.getChallengeData(any()) } throws IOException("Network Error")
 
         val flow = repository.getChallengeData("1")
-
         val emissions = flow.toList()
+
+        // Ensure there is at least one emission from the flow
+        assert(emissions.isNotEmpty())
+
+        // Ensure the first emission is Resource.Loading
         assert(emissions[0] is Resource.Loading)
-        assert(
-            emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Check internet"
-        )
+
+        // Verify that the second emission is Resource.Error with the correct error message for IO exception
+        assert(emissions[1] is Resource.Error && (emissions[1] as Resource.Error).message == "Network failure: Network Error")
     }
 }

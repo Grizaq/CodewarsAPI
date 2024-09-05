@@ -4,10 +4,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ListItemDefaults.contentColor
@@ -26,6 +30,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
 import com.example.tuicodewars.data.model.authored.Data.Companion.toCommaSeparatedString
@@ -33,6 +38,8 @@ import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.model.challenge.Challenge.Companion.shortenLongWords
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
+import com.example.tuicodewars.presentation.commons.Banner
+import com.example.tuicodewars.presentation.commons.PullToRefresh
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
 import com.example.tuicodewars.presentation.commons.SpacerHeight
@@ -43,6 +50,7 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 import java.util.Locale
 
+@OptIn(ExperimentalMaterialApi::class)
 @Destination
 @Composable
 fun ListDetails(
@@ -53,22 +61,43 @@ fun ListDetails(
     LaunchedEffect(challengeId) {
         viewModel.setChallengeId(challengeId)
     }
+
     val uiState by viewModel.challengeData.collectAsState()
     val challengeData = uiState.data
     val uriHandler = LocalUriHandler.current
-    Scaffold(
-        topBar = {
-            AppsTopAppBar(
-                pageName = stringResource(R.string.scaffold_text_challenge_details),
-                navigator = navigator
-            )
-        },
-        content = { padding ->
+    val bannerStateShow by viewModel.bannerStateShow.collectAsState()
+    val isRefreshing by viewModel.isRefreshingChallenge.collectAsStateWithLifecycle()
+    val pullRefreshState =
+        rememberPullRefreshState(isRefreshing, { viewModel.refreshData(challengeId) })
+
+    Scaffold(topBar = {
+        AppsTopAppBar(
+            pageName = stringResource(R.string.scaffold_text_challenge_details),
+            navigator = navigator
+        )
+    }, content = { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            // Banner showing data loaded from local storage
+            if (bannerStateShow) {
+                Banner(message = stringResource(R.string.banner_no_internet),
+                    onDismiss = { viewModel.hideBanner() })
+            }
             Box(
-                modifier = Modifier.padding(padding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
             ) {
+                PullToRefresh(
+                    isRefreshing = isRefreshing,
+                    pullRefreshState = pullRefreshState,
+                    Modifier.align(Alignment.TopCenter)
+                )
                 when (uiState) {
-                    is Resource.Success -> {
+                    is Resource.Success, is Resource.LocalData -> {
                         DetailsBody(challengeData, uriHandler)
                     }
 
@@ -78,23 +107,20 @@ fun ListDetails(
 
                     is Resource.Error -> {
                         uiState.message?.let {
-                            ShowErrorMessage(
-                                message = it,
-                                reload = { viewModel.getChallengeData(challengeId) }
-                            )
+                            ShowErrorMessage(message = it,
+                                reload = { viewModel.refreshData(challengeId) })
                         }
                         val messageReload = stringResource(R.string.standard_reload_error_message)
-                        LaunchedEffect(key1 = "") {
-                            delay(5 * 1000)
-                            viewModel.setChallengeId(challengeId)
-                            viewModel.getChallengeData(challengeId)
-                            Log.i("MainScreen", messageReload)
+                        LaunchedEffect(key1 = "error_reload") {
+                            delay(5 * 1000) // Retry delay
+                            viewModel.refreshData(challengeId)
+                            Log.i("ListDetailsScreen", messageReload)
                         }
                     }
                 }
             }
         }
-    )
+    })
 }
 
 @Composable
@@ -106,33 +132,45 @@ private fun DetailsBody(challengeData: Challenge?, uriHandler: UriHandler) {
                 .verticalScroll(rememberScrollState())
         ) {
             SpacerHeight(height = Dimensions.spacerMedium)
+
+            // Handle nullability safely
+            val name = challengeData?.name ?: "Unknown Challenge"
+            val totalAttempts = challengeData?.totalAttempts ?: 0
+            val totalCompleted = challengeData?.totalCompleted ?: 0
+            val languages =
+                challengeData?.languages?.toCommaSeparatedString() ?: "Unknown Languages"
+            val description = challengeData?.description?.shortenLongWords() ?: "No Description"
+            val url = challengeData?.url ?: ""
+
             Text(
-                text = "${challengeData?.name}",
+                text = name,
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
-            if (challengeData?.totalAttempts != 0) {
-                val completionRate =
-                    challengeData?.totalCompleted!!.toDouble() / challengeData.totalAttempts.toDouble() * 100
-                val formattedRate = String.format(Locale.US, "%.2f", completionRate).toDouble()
+
+            if (totalAttempts != 0) {
+                val completionRate = totalCompleted.toDouble() / totalAttempts.toDouble() * 100
+                val formattedRate = String.format(Locale.US, "%.2f", completionRate)
 
                 SpacerHeight(height = Dimensions.spacerMedium)
                 Text(text = "Completion rate of: $formattedRate%")
             }
+
             SpacerHeight(height = Dimensions.spacerMedium)
-            Text(text = "Languages: ${challengeData.languages.toCommaSeparatedString()}")
+            Text(text = "Languages: $languages")
             SpacerHeight(height = Dimensions.spacerMedium)
-            Text(text = "Description: ${challengeData.description.shortenLongWords()}")
+            Text(text = "Description: $description")
             SpacerHeight(height = Dimensions.spacerMedium)
+
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
             ) {
                 Button(
                     onClick = {
-                        uriHandler.openUri(challengeData.url)
-                    },
-                    colors = ButtonColors(
+                        if (url.isNotBlank()) {
+                            uriHandler.openUri(url)
+                        }
+                    }, colors = ButtonColors(
                         Color.Blue,
                         contentColor = Color.White,
                         disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),

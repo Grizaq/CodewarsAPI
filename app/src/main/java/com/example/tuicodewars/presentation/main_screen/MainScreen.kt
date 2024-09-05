@@ -7,10 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
@@ -31,12 +37,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
 import com.example.tuicodewars.data.model.user.DataJhoffner
-import com.example.tuicodewars.data.model.user.Languages
 import com.example.tuicodewars.domain.utils.Resource
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
+import com.example.tuicodewars.presentation.commons.Banner
+import com.example.tuicodewars.presentation.commons.PullToRefresh
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
 import com.example.tuicodewars.presentation.commons.SpacerHeight
@@ -48,6 +56,7 @@ import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterialApi::class)
 @RootNavGraph(start = true)
 @Destination
 @Composable
@@ -56,43 +65,65 @@ fun MainScreen(
     navigator: DestinationsNavigator
 ) {
     val uiState by viewModel.itemList.collectAsState()
-    val itemUserData = uiState.data
+    val bannerStateShow by viewModel.bannerStateShow.collectAsState()
+    val scrollState = rememberScrollState()
+    val isRefreshing by viewModel.isRefreshingMain.collectAsStateWithLifecycle()
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, { viewModel.refreshData() })
 
-    Scaffold(
-        topBar = {
-            AppsTopAppBar(
-                pageName = stringResource(R.string.scaffold_text_greeting_screen),
-                navigator = navigator
-            )
-        },
-        content = { padding ->
-            Box(
-                modifier = Modifier.padding(padding)
+
+    Scaffold(topBar = {
+        AppsTopAppBar(
+            pageName = stringResource(R.string.scaffold_text_greeting_screen), navigator = navigator
+        )
+    }, content = { padding ->
+        Box(
+            modifier = Modifier
+                .pullRefresh(pullRefreshState)
+                .padding(padding)
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                when (uiState) {
-                    is Resource.Success -> {
-                        MainScreenBody(itemUserData, navigator)
-                    }
+                // Banner showing data loaded from local storage
+                if (bannerStateShow) {
+                    Banner(message = stringResource(R.string.banner_no_internet),
+                        onDismiss = { viewModel.hideBanner() })
+                }
 
-                    is Resource.Loading -> {
-                        ShowLoadingIndicator()
-                    }
+                Box(
+                    modifier = Modifier.verticalScroll(scrollState)
+                ) {
+                    when (uiState) {
+                        is Resource.Success, is Resource.LocalData -> {
+                            MainScreenBody(uiState.data, navigator)
+                        }
 
-                    is Resource.Error -> {
-                        uiState.message?.let {
-                            ShowErrorMessage(message = it, reload = { viewModel.getItemList() })
+                        is Resource.Loading -> {
+                            ShowLoadingIndicator()
                         }
-                        val messageReload = stringResource(R.string.standard_reload_error_message)
-                        LaunchedEffect(key1 = "") {
-                            delay(5 * 1000)
-                            viewModel.getItemList()
-                            Log.i("MainScreen", messageReload)
+
+                        is Resource.Error -> {
+                            uiState.message?.let {
+                                ShowErrorMessage(message = it, reload = { viewModel.getItemList() })
+                            }
+                            val messageReload =
+                                stringResource(R.string.standard_reload_error_message)
+                            LaunchedEffect(key1 = "") {
+                                delay(5 * 1000)
+                                viewModel.getItemList()
+                                Log.i("MainScreen", messageReload)
+                            }
                         }
                     }
+                    PullToRefresh(
+                        isRefreshing = isRefreshing,
+                        pullRefreshState = pullRefreshState,
+                        Modifier.align(Alignment.TopCenter)
+                    )
                 }
             }
         }
-    )
+    })
 }
 
 @Composable
@@ -123,8 +154,7 @@ private fun MainScreenBody(itemUserData: DataJhoffner?, navigator: DestinationsN
         )
         SpacerHeight(height = Dimensions.spacerMedium)
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = centerAlignment
+            modifier = Modifier.fillMaxWidth(), contentAlignment = centerAlignment
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(Dimensions.fillDefault),
@@ -145,8 +175,7 @@ private fun MainScreenBody(itemUserData: DataJhoffner?, navigator: DestinationsN
                     )
                 }
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = centerAlignment
+                    modifier = Modifier.fillMaxWidth(), contentAlignment = centerAlignment
                 ) {
                     Text(
                         text = stringResource(
@@ -173,7 +202,8 @@ private fun MainScreenBody(itemUserData: DataJhoffner?, navigator: DestinationsN
                 .padding(Dimensions.paddingMedium),
             contentAlignment = centerAlignment
         ) {
-            val languageList = Languages.getLanguageNames(itemUserData.ranks.languages)
+            val languageList = itemUserData.ranks.languages.keys.toList()
+            Log.i("debugListItems", languageList.toString())
             LazyRow(Modifier.fillMaxWidth()) {
                 items(items = languageList) { item ->
                     Card(
@@ -190,8 +220,7 @@ private fun MainScreenBody(itemUserData: DataJhoffner?, navigator: DestinationsN
         SpacerHeight(Dimensions.spacerLarge)
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = centerAlignment) {
             Button(
-                onClick = { navigator.navigate(ListScreenDestination) },
-                colors = ButtonColors(
+                onClick = { navigator.navigate(ListScreenDestination) }, colors = ButtonColors(
                     Color.Blue,
                     contentColor = Color.White,
                     disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),
@@ -205,5 +234,6 @@ private fun MainScreenBody(itemUserData: DataJhoffner?, navigator: DestinationsN
                 )
             }
         }
+        SpacerHeight(height = Dimensions.spacerLarge)
     }
 }

@@ -2,29 +2,17 @@ package com.example.tuicodewars.presentation.view_models
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.tuicodewars.data.model.user.CodeChallenges
-import com.example.tuicodewars.data.model.user.Coffeescript
-import com.example.tuicodewars.data.model.user.Crystal
-import com.example.tuicodewars.data.model.user.Csharp
 import com.example.tuicodewars.data.model.user.DataJhoffner
-import com.example.tuicodewars.data.model.user.Elixir
-import com.example.tuicodewars.data.model.user.Haskell
-import com.example.tuicodewars.data.model.user.Java
-import com.example.tuicodewars.data.model.user.Javascript
-import com.example.tuicodewars.data.model.user.Languages
-import com.example.tuicodewars.data.model.user.Objc
-import com.example.tuicodewars.data.model.user.Overall
-import com.example.tuicodewars.data.model.user.Python
+import com.example.tuicodewars.data.model.user.LanguageDetails
 import com.example.tuicodewars.data.model.user.Ranks
-import com.example.tuicodewars.data.model.user.Ruby
-import com.example.tuicodewars.data.model.user.Shell
-import com.example.tuicodewars.data.model.user.Sql
-import com.example.tuicodewars.data.model.user.Typescript
 import com.example.tuicodewars.domain.repository.Repository
+import com.example.tuicodewars.domain.usecases.CheckNetworkUseCase
 import com.example.tuicodewars.domain.utils.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -51,34 +39,12 @@ class ViewModelJhoffnerTest {
     private val repository =
         mockk<Repository>(relaxed = true)
     private lateinit var viewModel: ViewModelJhoffner
-
-    private val mockLanguages = Languages(
-        coffeescript = Coffeescript(rank = -4, name = "4 kyu", color = "blue", score = 903),
-        java = Java(rank = -6, name = "6 kyu", color = "yellow", score = 100),
-        haskell = Haskell(rank = -6, name = "6 kyu", color = "yellow", score = 126),
-        typescript = Typescript(rank = -7, name = "7 kyu", color = "white", score = 22),
-        csharp = Csharp(rank = -6, name = "6 kyu", color = "yellow", score = 90),
-        crystal = Crystal(rank = -8, name = "8 kyu", color = "white", score = 4),
-        javascript = Javascript(rank = -3, name = "3 kyu", color = "blue", score = 2683),
-        ruby = Ruby(rank = -3, name = "3 kyu", color = "blue", score = 1906),
-        python = Python(rank = -5, name = "5 kyu", color = "yellow", score = 357),
-        elixir = Elixir(rank = -8, name = "8 kyu", color = "white", score = 2),
-        sql = Sql(rank = -6, name = "6 kyu", color = "yellow", score = 86),
-        shell = Shell(rank = -8, name = "8 kyu", color = "white", score = 5),
-        objc = Objc(rank = -8, name = "8 kyu", color = "white", score = 4)
-    )
-
-    private val mockOverall = Overall(
-        color = "blue",
-        name = "3 kyu",
-        rank = -3,
-        score = 2683
-    )
+    private val checkNetworkUseCase: CheckNetworkUseCase = mockk()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ViewModelJhoffner(repository)
+        viewModel = ViewModelJhoffner(repository, checkNetworkUseCase)
     }
 
     @After
@@ -109,10 +75,28 @@ class ViewModelJhoffnerTest {
     @Test
     fun `test getItemList updates itemList`() = runTest {
         val mockData = DataJhoffner(
-            codeChallenges = CodeChallenges(totalAuthored = 5, totalCompleted = 10),
+            id = "1",
+            codeChallenges = CodeChallenges(
+                totalAuthored = 5,
+                totalCompleted = 10
+            ),
             name = "Test Name",
-            ranks = Ranks(mockLanguages, mockOverall),
-            skills = listOf("Skill1", "Skill2")
+            ranks = Ranks(
+                languages = mapOf(
+                    "Kotlin" to LanguageDetails(
+                        color = "purple",
+                        name = "Kotlin",
+                        rank = 1,
+                        score = 1000
+                    ),
+                    "Java" to LanguageDetails(
+                        color = "white",
+                        name = "Java",
+                        rank = 2,
+                        score = 800
+                    )
+                )
+            )
         )
 
         val expectedResource = Resource.Success(mockData)
@@ -154,5 +138,51 @@ class ViewModelJhoffnerTest {
         // Verify repository method is called within coroutine scope
         testScope.advanceUntilIdle() // Ensure all coroutines are completed
         coVerify { repository.getItemsList() }
+    }
+
+    @Test
+    fun `test refreshData when internet is available`() = runTest {
+        coEvery { checkNetworkUseCase.isInternetAvailable() } returns true
+        coEvery { repository.getItemsList() } returns flowOf(Resource.Success(mockk()))
+
+        viewModel.refreshData()
+
+        // Verify that getItemsList was called
+        coVerify { repository.getItemsList() }
+
+        // Verify that the banner is not shown and refreshing is set to false
+        assertFalse(viewModel.bannerStateShow.value)
+        assertFalse(viewModel.isRefreshingMain.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
+    }
+
+    @Test
+    fun `test refreshData when internet is not available`() = runTest {
+        coEvery { checkNetworkUseCase.isInternetAvailable() } returns false
+
+        viewModel.refreshData()
+
+        // Verify that the banner is shown and refreshing is set to false
+        assertTrue(viewModel.bannerStateShow.value)
+        assertFalse(viewModel.isRefreshingMain.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
+    }
+
+    @Test
+    fun `test hideBanner`() = runTest {
+        // Set the banner to true before calling hideBanner
+        viewModel._bannerStateShow.value = true
+
+        viewModel.hideBanner()
+
+        // Verify that the banner is hidden
+        assertFalse(viewModel.bannerStateShow.value)
+
+        // Ensure all coroutines are completed
+        testScope.advanceUntilIdle()
     }
 }

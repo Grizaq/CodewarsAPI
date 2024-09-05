@@ -1,6 +1,6 @@
 package com.example.tuicodewars.data.model.user
 
-data class Objc(
+data class LanguageDetails(
     val color: String,
     val name: String,
     val rank: Int,
