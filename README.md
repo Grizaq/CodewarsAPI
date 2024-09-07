@@ -1,7 +1,7 @@
 # TuiCodewars
 Project Overview:
 
-This project is built with API provided by CodeWars, for the position #2 on the leaderboard - jhoffner, uses the MVVM architecture, adhering to the principles of clean architecture. It leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations. The project includes robust loading state handling to ensure a smooth user experience during data fetching.
+This project is built with the API provided by CodeWars, for the position #2 on the leaderboard - jhoffner. It follows the MVVM architecture and adheres to the principles of Clean Architecture. The app leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations. The project includes robust loading state handling to ensure a smooth user experience during data fetching. A local Room database is used to cache data for offline access, and a network checker is implemented to avoid unnecessary network requests when the internet is unavailable.
 
 Key Libraries:
 
@@ -18,6 +18,8 @@ Retrofit & Gson: For networking and JSON parsing.
 OkHttp: For HTTP requests and logging.
 
 Kotlinx Coroutines: For coroutine support.
+
+Room: For local database caching.
 
 JUnit & MockK: For unit testing and mocking.
 
