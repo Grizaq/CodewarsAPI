@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.internal.KaptGenerateStubsTask
 
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.ktlint)
     id("org.jetbrains.kotlin.kapt")
-    id("org.jlleitschuh.gradle.ktlint")
 }
 
 kotlin {
@@ -78,60 +78,75 @@ tasks.withType(type = KaptGenerateStubsTask::class) {
 }
 
 dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+    implementation(libs.junit.ktx)
 
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.activity:activity-compose:1.9.1")
-    implementation(platform("androidx.compose:compose-bom:2024.08.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.test.ext:junit-ktx:1.2.1")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    androidTestImplementation("androidx.test:core:1.6.1")
-    // Room
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    //noinspection KaptUsageInsteadOfKsp
-    kapt("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.room:room-common:2.6.1")
-    testImplementation("androidx.room:room-testing:2.6.1")
-    //  MockK
-    testImplementation("io.mockk:mockk:1.13.2")
-    androidTestImplementation("io.mockk:mockk-android:1.13.2")
-    //  compose destination
-    implementation("io.github.raamcosta.compose-destinations:core:1.7.27-beta")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.7.27-beta")
-    //  dagger-hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.0")
-    kapt("com.google.dagger:hilt-compiler:2.48")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
-    kaptAndroidTest("com.google.dagger:hilt-compiler:2.48")
-    //  retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    //  gson
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    // Okhttp
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.6")
-    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.6")
-    //  coroutine
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    //  lifecycle-compose
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    // swipe refresh
-    implementation("androidx.compose.material:material:1.6.8")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.test.core)
+
+    // Integration Testing Libraries
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.runner)
+
+    // Room dependencies
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    kapt(libs.room.compiler)
+    implementation(libs.room.common)
+    testImplementation(libs.room.testing)
+
+    // MockK for testing
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android)
+
+    // Compose Destinations
+    implementation(libs.compose.destinations.core)
+    ksp(libs.compose.destinations.ksp)
+
+    // Hilt dependencies
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.compiler)
+    androidTestAnnotationProcessor(libs.hilt.compiler)
+
+    // Hilt Navigation Compose
+    implementation(libs.hilt.navigation.compose)
+
+    // Retrofit & Gson
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+
+    // OkHttp
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    // Lifecycle Compose
+    implementation(libs.lifecycle.runtime.compose)
+
+    // Swipe Refresh
+    implementation(libs.material)
 }
 
 kapt {

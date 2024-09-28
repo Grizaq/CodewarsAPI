@@ -1,7 +1,11 @@
 # TuiCodewars
 Project Overview:
 
-This project created for the position Chiril Grituc android developer, by Chiril Grituc, built with the open API provided by CodeWars in [CodeWars API Documentation](https://dev.codewars.com/), for the position #2 on the leaderboard - jhoffner. It follows the MVVM architecture and adheres to the principles of Clean Architecture. The app leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations. The project includes robust loading state handling to ensure a smooth user experience during data fetching. A local Room database is used to cache data for offline access, and a network checker is implemented to avoid unnecessary network requests when the internet is unavailable.
+This project was created for the Android Developer position by Chiril Grituc, built with the open API provided by CodeWars in [CodeWars API Documentation](https://dev.codewars.com/), specifically for the position #2 on the leaderboard - Jhoffner. It follows the MVVM architecture and adheres to the principles of Clean Architecture. The app leverages Jetpack Compose with Material3 design for a modern and responsive UI. Dependency injection is handled with Dagger/Hilt, and coroutines are used for asynchronous operations.
+
+The project includes comprehensive testing, utilizing both unit tests with JUnit and MockK, as well as integration tests to ensure the MainScreen functions correctly under various states (loading, success, error, and local data). Robust loading state handling is implemented to provide a smooth user experience during data fetching. Additionally, a local Room database is used to cache data for offline access, and a network checker avoids unnecessary network requests when the internet is unavailable.
+
+To streamline dependency management, the project has been migrated to use a version catalog, simplifying the process of adding and updating libraries.
 
 Key Libraries:
 
