@@ -10,6 +10,7 @@ import com.example.tuicodewars.data.remote.API
 import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.utils.NetworkChecker
 import com.example.tuicodewars.domain.utils.Resource
+import com.example.tuicodewars.domain.utils.generateLogoUrlsForLanguages
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -90,8 +91,22 @@ class RepositoryJhoffner @Inject constructor(
                 val response = api.getAuthoredList()
                 if (response.isSuccessful) {
                     response.body()?.let { remoteData ->
-                        authoredDao.insertAuthored(remoteData)
-                        emit(Resource.Success(remoteData))
+                        // Map remote data to include logoUrls
+                        val populatedDataList = remoteData.data.map { dataItem ->
+                            dataItem.copy(
+                                logoUrls = dataItem.languages.generateLogoUrlsForLanguages() // Populate logoUrls
+                            )
+                        }
+
+                        // Create a new Authored object with populated data
+                        val authoredWithLogoUrls = Authored(
+                            data = populatedDataList
+                        )
+
+                        // Insert the new Authored object into the database
+                        authoredDao.insertAuthored(authoredWithLogoUrls)
+
+                        emit(Resource.Success(authoredWithLogoUrls))
                     } ?: emit(Resource.Error("Empty response body", localData))
                 } else {
                     if (!hasLocalData) {

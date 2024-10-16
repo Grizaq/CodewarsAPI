@@ -18,6 +18,8 @@ androidxTestCoreVersion = "1.6.1"
 androidxTestRulesVersion = "1.6.1"
 androidxTestRunnerVersion = "1.6.2"
 materialVersion = "1.1.0"
+glideVersion = "1.5.0"
+accompanistVersion = "0.28.0"
 
 
 [libraries]
@@ -63,6 +65,11 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 
 lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeKtx" }
 material = { group = "androidx.compose.material", name = "material", version.ref = "materialVersion" }
+
+glide = { group = "com.github.skydoves", name = "landscapist-glide", version.ref = "glideVersion" }
+
+accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanistVersion" }
+accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanistVersion" }
 
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }

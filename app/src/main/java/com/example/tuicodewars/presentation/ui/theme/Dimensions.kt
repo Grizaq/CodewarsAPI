@@ -11,6 +11,9 @@ object Dimensions {
     const val fillDefault = 0.9f
     const val fillHalf = 0.5f
 
+    // UI rounding values
+    const val roundingPercent = 10
+
     // Spacer values
     val spacerSmall = 8.dp
     val spacerMedium = 16.dp
@@ -18,11 +21,15 @@ object Dimensions {
 
     // padding values
     val paddingXSmall = 8.dp
+    val paddingSmall = 12.dp
     val paddingMedium = 16.dp
     val paddingLarge = 20.dp
 
     // Elevation values
     val elevationMedium = 8.dp
+
+    // UI Size values
+    val pagerHeight = 200.dp
 
     // design size values
     val shadowMedium = 8.dp

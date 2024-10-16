@@ -13,7 +13,7 @@ import com.example.tuicodewars.data.model.challenge.Challenge
 import com.example.tuicodewars.data.model.user.DataJhoffner
 import com.example.tuicodewars.data.utils.converters.Converters
 
-@Database(entities = [DataJhoffner::class, Authored::class, Challenge::class], version = 4, exportSchema = false)
+@Database(entities = [DataJhoffner::class, Authored::class, Challenge::class], version = 5, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class UserDatabase : RoomDatabase() {
     abstract fun dataJhoffnerDao(): DataJhoffnerDao

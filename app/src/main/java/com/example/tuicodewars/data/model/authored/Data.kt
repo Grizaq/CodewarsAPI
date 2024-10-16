@@ -15,7 +15,9 @@ data class Data(
     val rank: Int,
     val rankName: String,
     @TypeConverters(Converters::class)
-    val tags: List<String>
+    val tags: List<String>,
+    @TypeConverters(Converters::class)
+    val logoUrls: List<String> = emptyList()
 ) {
     companion object {
         fun List<String>.toCommaSeparatedString(): String {

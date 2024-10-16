@@ -7,14 +7,17 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -37,19 +40,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.util.lerp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
 import com.example.tuicodewars.data.model.authored.Data
 import com.example.tuicodewars.data.model.authored.Data.Companion.toCommaSeparatedString
 import com.example.tuicodewars.domain.utils.Resource
+import com.example.tuicodewars.domain.utils.generateLogoUrlsForLanguages
 import com.example.tuicodewars.presentation.commons.AppsTopAppBar
 import com.example.tuicodewars.presentation.commons.Banner
 import com.example.tuicodewars.presentation.commons.PullToRefresh
@@ -59,10 +67,17 @@ import com.example.tuicodewars.presentation.commons.SpacerHeight
 import com.example.tuicodewars.presentation.destinations.ListDetailsDestination
 import com.example.tuicodewars.presentation.ui.theme.Dimensions
 import com.example.tuicodewars.presentation.view_models.ViewModelAuthoredList
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalMaterialApi::class)
 @Destination
@@ -134,6 +149,7 @@ fun ListScreen(
     )
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 private fun ListBody(
     challengesList: List<Data>,
@@ -165,6 +181,58 @@ private fun ListBody(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Generate logo URLs for all languages
+                        val logoUrls = item.languages.generateLogoUrlsForLanguages()
+
+                        // Create a pager state
+                        val pagerState = rememberPagerState(initialPage = 0)
+
+
+                        // HorizontalPager to display multiple logos
+                        HorizontalPager(
+                            count = logoUrls.size, // Number of logos
+                            state = pagerState,
+                            modifier = Modifier
+                                .height(Dimensions.pagerHeight) // Set your desired pager height
+                                .fillMaxWidth()
+                        ) { page ->
+                            // Display each logo in the pager
+                            Card(shape = RoundedCornerShape(Dimensions.paddingSmall),
+                                modifier = Modifier.graphicsLayer {
+                                    val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
+                                    lerp(
+                                        start = 0.85f,
+                                        stop = 1f,
+                                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                    ).also { scale ->
+                                        scaleX = scale
+                                        scaleY = scale
+                                    }
+                                    alpha = lerp(
+                                        start = 0.5f,
+                                        stop = 1f,
+                                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                    )
+                                }) {
+                                GlideImage(
+                                    imageModel = logoUrls[page], // Display logo for each page
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(Dimensions.roundingPercent))
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(Dimensions.fillDefault),
+                                )
+                            }
+                        }
+
+                        // Pager Indicator for logos
+                        HorizontalPagerIndicator(
+                            pagerState = pagerState,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(Dimensions.paddingMedium)
+                        )
+
                         Text(
                             text = item.name,
                             textAlign = TextAlign.Center,

@@ -147,6 +147,13 @@ dependencies {
 
     // Swipe Refresh
     implementation(libs.material)
+
+    //glide(landscapist)
+    implementation (libs.glide)
+
+    // Image paging
+    implementation (libs.accompanist.pager)
+    implementation (libs.accompanist.pager.indicators)
 }
 
 kapt {
