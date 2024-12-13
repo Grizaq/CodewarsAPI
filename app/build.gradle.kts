@@ -154,6 +154,11 @@ dependencies {
     // Image paging
     implementation (libs.accompanist.pager)
     implementation (libs.accompanist.pager.indicators)
+
+    // Firebase dependencies for notifications and dynamic configurations
+    implementation (libs.firebase.core)
+    implementation (libs.firebase.messaging)
+    implementation (libs.firebase.remoteConfig)
 }
 
 kapt {

@@ -20,6 +20,9 @@ androidxTestRunnerVersion = "1.6.2"
 materialVersion = "1.1.0"
 glideVersion = "1.5.0"
 accompanistVersion = "0.28.0"
+firebaseVersionCore = "21.1.1"
+firebaseVersionMessaging = "24.1.0"
+firebaseVersionRemoteConfig = "22.0.1"
 
 
 [libraries]
@@ -82,6 +85,9 @@ junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "ju
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoVersion" }
 androidx-core-testing = { group = "androidx.arch.core", name = "core-testing", version = "2.2.0" }
 
+firebase-core = { group = "com.google.firebase", name = "firebase-core", version.ref = "firebaseVersionCore" }
+firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging", version.ref = "firebaseVersionMessaging" }
+firebase-remoteConfig = { group = "com.google.firebase", name = "firebase-config", version.ref = "firebaseVersionRemoteConfig" }
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }

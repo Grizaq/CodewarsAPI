@@ -12,7 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.tuicodewars.R
@@ -36,8 +35,8 @@ fun ShowErrorMessage(message: String, reload: () -> Unit) {
                 Button(
                     onClick = { reload() },
                     colors = ButtonColors(
-                        Color.Blue,
-                        contentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         disabledContainerColor = contentColor.copy(alpha = Dimensions.contentColor),
                         disabledContentColor = contentColor.copy(alpha = Dimensions.contentColor)
                     ),
@@ -47,7 +46,7 @@ fun ShowErrorMessage(message: String, reload: () -> Unit) {
                 ) {
                     Text(
                         text = stringResource(R.string.reload_text),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onPrimary,
                         fontSize = Dimensions.buttonTextSize
                     )
                 }

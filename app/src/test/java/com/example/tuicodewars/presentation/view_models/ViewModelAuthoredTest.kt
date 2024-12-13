@@ -39,6 +39,21 @@ class ViewModelAuthoredTest {
     private lateinit var viewModel: ViewModelAuthoredList
     private val checkNetworkUseCase:CheckNetworkUseCase = mockk()
 
+    private val mockData = Authored(
+        data = listOf(
+            Data(
+                description = "Test Description",
+                id = "1",
+                languages = listOf("ruby", "java"),
+                name = "Test Data",
+                rank = 1,
+                rankName = "Beginner",
+                tags = listOf("Tag1", "Tag2")
+            )
+        )
+    )
+
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -71,20 +86,6 @@ class ViewModelAuthoredTest {
 
     @Test
     fun `test getAuthoredList updates authoredList`() = runTest {
-        val mockData = Authored(
-            data = listOf(
-                Data(
-                    description = "Test Description",
-                    id = "1",
-                    languages = listOf("Kotlin", "Java"),
-                    name = "Test Data",
-                    rank = 1,
-                    rankName = "Beginner",
-                    tags = listOf("Tag1", "Tag2")
-                )
-            )
-        )
-
         val expectedResource = Resource.Success(mockData)
 
         coEvery { repository.getAuthoredList() } returns flowOf(expectedResource)
@@ -128,15 +129,18 @@ class ViewModelAuthoredTest {
 
     @Test
     fun `test refreshData when internet is available`() = runTest {
+        // Mock network check
         coEvery { checkNetworkUseCase.isInternetAvailable() } returns true
-        coEvery { repository.getAuthoredList() } returns flowOf(Resource.Success(mockk()))
 
+        coEvery { repository.getAuthoredList() } returns flowOf(Resource.Success(mockData))
+
+        // Call the function to be tested
         viewModel.refreshData()
 
-        // Verify that getAuthoredList was called
+        // Verify the repository call was made
         coVerify { repository.getAuthoredList() }
 
-        // Verify that the banner is not shown and refreshing is set to false
+        // Assert that the banner is not shown and refreshing is set to false
         assertFalse(viewModel.bannerStateShow.value)
         assertFalse(viewModel.isRefreshingList.value)
 

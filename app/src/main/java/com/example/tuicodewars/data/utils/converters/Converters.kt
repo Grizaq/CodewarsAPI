@@ -31,7 +31,8 @@ class Converters {
     @TypeConverter
     fun toDataList(value: String?): List<Data>? {
         val listType = object : TypeToken<List<Data>>() {}.type
-        return gson.fromJson(value, listType)
+        val dataList = gson.fromJson<List<Data>>(value, listType)
+        return dataList?.map { it.copy(logoUrls = it.logoUrls ?: emptyList()) }
     }
 
     // Converters for Map<String, LanguageDetails>

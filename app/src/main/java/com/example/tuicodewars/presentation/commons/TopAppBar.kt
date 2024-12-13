@@ -15,18 +15,20 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.tuicodewars.R
 import com.example.tuicodewars.presentation.ui.theme.Dimensions
+import com.example.tuicodewars.presentation.ui.theme.Transparent
+import com.example.tuicodewars.presentation.ui.theme.White
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 /*
@@ -38,60 +40,52 @@ Uses ComposeDestinations library's navigator
 fun AppsTopAppBar(pageName: String, navigator: DestinationsNavigator) {
     val context = LocalContext.current
     val eMailTopic = stringResource(
-        R.string.message_about,
-        pageName
+        R.string.message_about, pageName
     )
-    TopAppBar(
-        colors = TopAppBarColors(
-            containerColor = Color.Blue,
-            Color.Transparent,
-            Color.Transparent,
-            Color.White,
-            Color.Transparent
-        ),
-        title = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .offset(x = Dimensions.scaffoldOffset),
-                contentAlignment = Alignment.Center
+    TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        titleContentColor = MaterialTheme.colorScheme.onPrimary
+    ), title = {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Transparent)
+                .offset(x = Dimensions.scaffoldOffset), contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    IconButton(onClick = { navigator.navigateUp() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back_button_desc)
-                        )
-                    }
-                    Text(
-                        text = pageName,
-                        maxLines = 1,
-                        modifier = Modifier
-                            .fillMaxWidth(Dimensions.fillDefault)
-                            .background(Color.Transparent),
-                        textAlign = TextAlign.Center,
-                        fontSize = Dimensions.scaffoldTextSize,
-                        color = Color.White
+                IconButton(onClick = { navigator.navigateUp() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back_button_desc)
                     )
-                    IconButton(onClick = {
-                        context.sendMail(
-                            to = "example@gmail.com", // To be adjusted e.g. support
-                            subject = eMailTopic // Autofill for e-mail subject
-                        )
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = stringResource(R.string.back_button_desc)
-                        )
-                    }
+                }
+                Text(
+                    text = pageName,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth(Dimensions.fillDefault)
+                        .background(Transparent),
+                    textAlign = TextAlign.Center,
+                    fontSize = Dimensions.scaffoldTextSize,
+                    color = White
+                )
+                IconButton(onClick = {
+                    context.sendMail(
+                        to = "example@gmail.com", // To be adjusted e.g. support
+                        subject = eMailTopic // Autofill for e-mail subject
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = stringResource(R.string.back_button_desc)
+                    )
                 }
             }
         }
-    )
+    })
 }
 
 fun Context.sendMail(to: String, subject: String) {

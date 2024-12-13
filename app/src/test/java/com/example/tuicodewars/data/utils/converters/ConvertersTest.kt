@@ -46,13 +46,14 @@ class ConvertersTest {
         val json =
             """[{"id":"1","description":"Description1","languages":["Kotlin"],"name":"Data1","rank":1,"rankName":"4 Kyu","tags":["Tag1"]},{"id":"2","description":"Description2","languages":["Java"],"name":"Data2","rank":2,"rankName":"6 kyu","tags":["Tag2"]}]"""
         val expectedList = listOf(
-            Data("1", "Description1", listOf("Kotlin"), "Data1", 1, "4 Kyu", listOf("Tag1")),
-            Data("2", "Description2", listOf("Java"), "Data2", 2, "6 kyu", listOf("Tag2"))
+            Data("1", "Description1", listOf("Kotlin"), "Data1", 1, "4 Kyu", listOf("Tag1"), emptyList()),
+            Data("2", "Description2", listOf("Java"), "Data2", 2, "6 kyu", listOf("Tag2"), emptyList())
         )
 
         val actualList = converters.toDataList(json)
         assertEquals(expectedList, actualList)
     }
+
 
     @Test
     fun `test fromLanguagesMap converts Map to JSON string`() {

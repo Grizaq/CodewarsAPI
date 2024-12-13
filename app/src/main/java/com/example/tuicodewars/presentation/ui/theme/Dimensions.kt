@@ -32,7 +32,7 @@ object Dimensions {
     val pagerHeight = 200.dp
 
     // design size values
-    val shadowMedium = 8.dp
+    val shadowMedium = 16.dp
     val toTopButtonSize = 64.dp
     val toTopArrowSize = 40.dp
 

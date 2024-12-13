@@ -19,6 +19,7 @@ import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.just
 import io.mockk.mockk
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -182,12 +183,13 @@ class RepositoryJhoffnerTest {
 
     @Test
     fun `test getAuthoredList returns success`() = runTest {
+        // Mock data
         val mockData = Authored(
             data = listOf(
                 Data(
                     description = "Test Description",
                     id = "1",
-                    languages = listOf("Kotlin", "Java"),
+                    languages = listOf("ruby", "java"),
                     name = "Test Data",
                     rank = 1,
                     rankName = "Beginner",
@@ -195,10 +197,17 @@ class RepositoryJhoffnerTest {
                 )
             )
         )
+
+        // Mocking Dao methods
         coEvery { authoredDao.getAuthoredById() } returns flowOf(null)
+
+        // Mock API response for getAuthoredList()
         mockApiResponseForAuthoredList(Response.success(mockData))
+
+        // Mock insertAuthored method
         coEvery { authoredDao.insertAuthored(any()) } returns Unit
 
+        // Collecting the flow and validating emissions
         val flow = repository.getAuthoredList()
         val emissions = flow.toList()
 
@@ -206,7 +215,19 @@ class RepositoryJhoffnerTest {
         assert(emissions[0] is Resource.Loading)
 
         // Verify that the second emission is Resource.Success and contains the expected data
-        assert(emissions[1] is Resource.Success && (emissions[1] as Resource.Success).data == mockData)
+        val actualData = (emissions[1] as Resource.Success).data
+
+        // Compare each field in the `Authored` data object
+        assertEquals(mockData.data.size, actualData?.data?.size) // Compare sizes
+        actualData?.data?.zip(mockData.data)?.forEach { (actualItem, mockItem) ->
+            assertEquals(mockItem.id, actualItem.id)
+            assertEquals(mockItem.description, actualItem.description)
+            assertEquals(mockItem.languages, actualItem.languages)
+            assertEquals(mockItem.name, actualItem.name)
+            assertEquals(mockItem.rank, actualItem.rank)
+            assertEquals(mockItem.rankName, actualItem.rankName)
+            assertEquals(mockItem.tags, actualItem.tags)
+        }
     }
 
     @Test

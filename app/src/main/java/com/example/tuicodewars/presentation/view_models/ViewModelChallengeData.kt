@@ -66,4 +66,12 @@ class ViewModelChallengeData @Inject constructor(
     fun hideBanner() {
         _bannerStateShow.value = false
     }
+
+    fun calculateCompletionRate(challengeData: Challenge?): String? {
+        val totalAttempts = challengeData?.totalAttempts ?: 0
+        val totalCompleted = challengeData?.totalCompleted ?: 0
+        return if (totalAttempts != 0) {
+            "%.2f".format(totalCompleted.toDouble() / totalAttempts * 100)
+        } else null
+    }
 }

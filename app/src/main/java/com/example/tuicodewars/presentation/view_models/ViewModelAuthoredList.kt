@@ -8,6 +8,7 @@ import com.example.tuicodewars.domain.repository.Repository
 import com.example.tuicodewars.domain.usecases.CheckNetworkUseCase
 import com.example.tuicodewars.domain.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,9 +26,13 @@ class ViewModelAuthoredList @Inject constructor(
 
     val _bannerStateShow = MutableStateFlow(false)
     val bannerStateShow: StateFlow<Boolean> = _bannerStateShow
+    private val _selectedLanguage = MutableStateFlow<String?>(null)
+    val selectedLanguage: StateFlow<String?> = _selectedLanguage.asStateFlow()
 
     private val _isRefreshingList = MutableStateFlow(false)
     val isRefreshingList: StateFlow<Boolean> = _isRefreshingList.asStateFlow()
+    private val _availableLanguages = MutableStateFlow<List<String>>(emptyList())
+    val availableLanguages: StateFlow<List<String>> = _availableLanguages.asStateFlow()
 
     val scrollState = LazyListState()
 
@@ -42,6 +47,12 @@ class ViewModelAuthoredList @Inject constructor(
         _bannerStateShow.value = when (resource) {
             is Resource.LocalData -> true
             else -> false
+        }
+
+        if (resource is Resource.Success || resource is Resource.LocalData) {
+            _availableLanguages.value =
+                listOf("All") + (resource.data?.data?.flatMap { it.languages }?.distinct()
+                    ?: emptyList())
         }
     }
 
@@ -66,5 +77,15 @@ class ViewModelAuthoredList @Inject constructor(
 
     fun hideBanner() {
         _bannerStateShow.value = false
+    }
+
+    fun setSelectedLanguage(language: String?) {
+        _selectedLanguage.value = language
+    }
+
+    fun scrollToTop(scope: CoroutineScope) {
+        scope.launch {
+            scrollState.animateScrollToItem(0)
+        }
     }
 }

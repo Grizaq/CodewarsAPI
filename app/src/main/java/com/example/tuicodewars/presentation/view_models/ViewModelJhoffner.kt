@@ -19,8 +19,7 @@ class ViewModelJhoffner @Inject constructor(
     private val repo: Repository, private val checkNetworkUseCase: CheckNetworkUseCase
 ) : ViewModel() {
 
-    private val _itemList: MutableStateFlow<Resource<DataJhoffner>> =
-        MutableStateFlow(Resource.Loading())
+    private val _itemList: MutableStateFlow<Resource<DataJhoffner>> = MutableStateFlow(Resource.Loading())
     val itemList: StateFlow<Resource<DataJhoffner>> = _itemList
 
     val _bannerStateShow = MutableStateFlow(false)
