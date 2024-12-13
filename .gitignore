@@ -1,17 +1,37 @@
+# Android Studio files and folders
+.idea/
 *.iml
 *.bin
 *.lock
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
+.gradle/
+/build/
+/captures/
+.local.properties
+/.DS_Store
+
+# Temporary files
+/node_modules/
+/out/
+/gen/
+.cxx/
+.externalNativeBuild/
+/logs/*
+*.log
+
+# IDE-specific files
+/.idea/
+/.idea/caches/
+/.idea/libraries/
 /.idea/modules.xml
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Generated files
+*.jar
+*.class
+*.dex
+*.apk
+*.ap_
+*.so
+/app/google-services.json
