@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
     id("org.jetbrains.kotlin.kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 kotlin {
@@ -156,6 +157,8 @@ dependencies {
     implementation (libs.accompanist.pager.indicators)
 
     // Firebase dependencies for notifications and dynamic configurations
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
     implementation (libs.firebase.core)
     implementation (libs.firebase.messaging)
     implementation (libs.firebase.remoteConfig)

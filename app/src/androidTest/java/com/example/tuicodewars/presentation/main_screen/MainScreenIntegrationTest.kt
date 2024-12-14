@@ -9,7 +9,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipe
 import androidx.navigation.compose.rememberNavController
 import com.example.tuicodewars.domain.usecases.CheckNetworkUseCase
-import com.example.tuicodewars.presentation.view_models.ViewModelJhoffner
+import com.example.tuicodewars.presentation.view_models.ViewModelMainScreen
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -25,7 +25,7 @@ class MainScreenIntegrationTest {
 
     private lateinit var fakeRepository: FakeRepository
     private lateinit var navigatorMock: NavigatorMock
-    private lateinit var viewModel: ViewModelJhoffner
+    private lateinit var viewModel: ViewModelMainScreen
     private lateinit var fakeNetworkChecker: FakeNetworkChecker
     private lateinit var checkNetworkUseCase: CheckNetworkUseCase
 
@@ -35,7 +35,7 @@ class MainScreenIntegrationTest {
         fakeNetworkChecker = FakeNetworkChecker()
         checkNetworkUseCase = CheckNetworkUseCase(fakeNetworkChecker)
 
-        viewModel = ViewModelJhoffner(fakeRepository, checkNetworkUseCase)
+        viewModel = ViewModelMainScreen(fakeRepository, checkNetworkUseCase)
     }
 
     @Test

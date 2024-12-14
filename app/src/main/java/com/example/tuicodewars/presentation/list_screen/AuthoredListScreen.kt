@@ -16,7 +16,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tuicodewars.R
@@ -27,6 +26,7 @@ import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
 import com.example.tuicodewars.presentation.utils.ScrollToTopButton
 import com.example.tuicodewars.presentation.commons.LocalDataBanner
+import com.example.tuicodewars.presentation.commons.rememberDynamicTitle
 import com.example.tuicodewars.presentation.view_models.ViewModelAuthoredList
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -47,10 +47,12 @@ fun ListScreen(
     val bannerStateShow by viewModel.bannerStateShow.collectAsState()
     val allLanguages by viewModel.availableLanguages.collectAsState()
     val selectedLanguage by viewModel.selectedLanguage.collectAsState()
+    // Currently on default value
+    val dynamicTitle = rememberDynamicTitle("app_bar_title_list", R.string.scaffold_text_authored_list)
 
     Scaffold(topBar = {
         AppsTopAppBar(
-            pageName = stringResource(R.string.scaffold_text_authored_list), navigator = navigator
+            pageName = dynamicTitle.value, navigator = navigator
         )
     }, content = { padding ->
         Column(

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ViewModelJhoffner @Inject constructor(
+class ViewModelMainScreen @Inject constructor(
     private val repo: Repository, private val checkNetworkUseCase: CheckNetworkUseCase
 ) : ViewModel() {
 

@@ -25,11 +25,24 @@ Kotlinx Coroutines: For coroutine support.
 
 Room: For local database caching.
 
+Firebase Analytics: Integrated for tracking app usage, user interactions, and providing valuable insights to improve user engagement.
+
+Firebase Cloud Messaging: Implemented to enable push notifications, delivering updates and alerts directly to the user.
+
+Firebase Remote Config: Used for dynamic configuration changes, allowing real-time updates to app behavior without requiring an app update.
+
 JUnit & MockK: For unit testing and mocking.
 
 Compose Destinations: For navigation in Compose.
 
 
+
+- **Notifications**:
+
+![](Screenshot_notifications.png)
+
+
+- **Light Theme Screens**:
 
 ![](Screenshot_light_greeting_screen.png)
 
@@ -37,8 +50,16 @@ Compose Destinations: For navigation in Compose.
 
 ![](Screenshot_light_challenge_details_screen.png)
 
+
+- **Dark Theme Screens**:
+
 ![](Screenshot_dark_greeting_screen.png)
 
 ![](Screenshot_dark_list_authored_screen.png)
 
 ![](Screenshot_dark_challenge_details_screen.png)
+
+
+- **Remote Config Modified Title**:
+
+![](Screenshot_remote_config_title.png)

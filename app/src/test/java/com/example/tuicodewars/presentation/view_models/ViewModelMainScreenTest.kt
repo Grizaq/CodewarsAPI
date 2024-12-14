@@ -29,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class ViewModelJhoffnerTest {
+class ViewModelMainScreenTest {
 
     @get:Rule
     val instantExecutorRule = InstantTaskExecutorRule() // Ensures LiveData runs on the main thread
@@ -38,13 +38,13 @@ class ViewModelJhoffnerTest {
     private val testScope = TestScope(testDispatcher)
     private val repository =
         mockk<Repository>(relaxed = true)
-    private lateinit var viewModel: ViewModelJhoffner
+    private lateinit var viewModel: ViewModelMainScreen
     private val checkNetworkUseCase: CheckNetworkUseCase = mockk()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        viewModel = ViewModelJhoffner(repository, checkNetworkUseCase)
+        viewModel = ViewModelMainScreen(repository, checkNetworkUseCase)
     }
 
     @After

@@ -30,7 +30,8 @@ import com.example.tuicodewars.presentation.commons.PullToRefresh
 import com.example.tuicodewars.presentation.commons.ShowErrorMessage
 import com.example.tuicodewars.presentation.commons.ShowLoadingIndicator
 import com.example.tuicodewars.presentation.commons.LocalDataBanner
-import com.example.tuicodewars.presentation.view_models.ViewModelJhoffner
+import com.example.tuicodewars.presentation.commons.rememberDynamicTitle
+import com.example.tuicodewars.presentation.view_models.ViewModelMainScreen
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -41,7 +42,7 @@ import kotlinx.coroutines.delay
 @Destination
 @Composable
 fun MainScreen(
-    viewModel: ViewModelJhoffner = viewModel(LocalContext.current as ComponentActivity),
+    viewModel: ViewModelMainScreen = viewModel(LocalContext.current as ComponentActivity),
     navigator: DestinationsNavigator
 ) {
     val uiState by viewModel.itemList.collectAsState()
@@ -49,11 +50,12 @@ fun MainScreen(
     val scrollState = rememberScrollState()
     val isRefreshing by viewModel.isRefreshingMain.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, { viewModel.refreshData() })
-
+    // Modified to Main Screen in Remote Config
+    val dynamicTitle = rememberDynamicTitle("app_bar_title_main", R.string.scaffold_text_greeting_screen)
 
     Scaffold(topBar = {
         AppsTopAppBar(
-            pageName = stringResource(R.string.scaffold_text_greeting_screen), navigator = navigator
+            pageName = dynamicTitle.value, navigator = navigator
         )
     }, content = { padding ->
         Box(
@@ -103,4 +105,3 @@ fun MainScreen(
         }
     })
 }
-
